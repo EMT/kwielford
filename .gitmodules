@@ -1,0 +1,6 @@
+[submodule "libraries/li3_fieldwork"]
+	path = libraries/li3_fieldwork
+	url = https://github.com/EMT/li3_fieldwork.git
+[submodule "libraries/li3_auth"]
+	path = libraries/li3_auth
+	url = https://github.com/EMT/li3_auth.git

@@ -4,3 +4,6 @@
 [submodule "libraries/li3_auth"]
 	path = libraries/li3_auth
 	url = https://github.com/EMT/li3_auth.git
+[submodule "libraries/lithium"]
+	path = libraries/lithium
+	url = https://github.com/UnionOfRAD/lithium.git

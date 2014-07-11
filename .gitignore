@@ -1,2 +1,7 @@
-libraries/*
-resources/tmp/*
+.DS_Store
+libraries*
+app/libraries/*
+app/resources/tmp/*
+.*.sw[op]
+last_migration.txt
+*.sass-cache*

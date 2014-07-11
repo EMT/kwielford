@@ -120,6 +120,8 @@ Libraries::add('app', array('default' => true));
 /**
  * Add some plugins:
  */
+Libraries::add('li3_auth');
+Libraries::add('li3_fieldwork');
 // Libraries::add('li3_docs');
 
 ?>

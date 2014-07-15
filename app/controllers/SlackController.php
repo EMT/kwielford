@@ -20,7 +20,7 @@ class SlackController extends \li3_fieldwork\extensions\action\Controller {
 
 				case 'be happy':
 					// TODO change mood and face to happy
-					return "I am happy."
+					return "I am happy.";
 
 				default:
 					return 'I don’t understand: ' . $text;

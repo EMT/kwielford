@@ -20,6 +20,7 @@ class SlackController extends \li3_fieldwork\extensions\action\Controller {
 
 				default:
 					return 'You said: ' . $text;
+			}
 
 		}
 	}

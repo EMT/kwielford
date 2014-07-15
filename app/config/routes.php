@@ -48,7 +48,7 @@ Router::connect('/', 'Pages::view');
  */
 Router::connect('/pages/{:args}', 'Pages::view');
 
-
+Router::connect('/slack.{:type}', 'Slack::incoming');
 Router::connect('/slack', 'Slack::incoming');
 
 /**

@@ -11,7 +11,8 @@ use li3_fieldwork\extensions\helper\Share;
 Controller::config([
     'whitelisted_formats' => ['json'],
     'non_secured_actions' => [
-        'slack.json'
+        'slack.json',
+        'slack'
     ]
 ]);
 

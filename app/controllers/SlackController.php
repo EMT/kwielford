@@ -23,7 +23,7 @@ class SlackController extends \li3_fieldwork\extensions\action\Controller {
 
 				case 'be happy':
 					Cache::write('default', 'k-mood', 'happy');
-					file_get_contents('http://10.0.1.52/?mood=happy');
+					return file_get_contents('http://10.0.1.52/?mood=happy');
 					return "I am happy.";
 
 				case 'be neutral':
@@ -45,7 +45,7 @@ class SlackController extends \li3_fieldwork\extensions\action\Controller {
 
 		}
 
-		file_get_contents('http://10.0.1.52/?mood=happy');
+		file_get_contents('http://10.0.1.52/?mood=angry');
 					return "This is a test.";
 	}
 

@@ -22,17 +22,17 @@ class SlackController extends \li3_fieldwork\extensions\action\Controller {
 					return "Some things you can ask me to do…\n\nReminders\n---------\n/kwiz remind me at 2pm to do that thing\n/kwiz remind me on thursday at 9am to do that other thing\n/kwiz remind me at 3pm on 25 aug to do that thing in the distant future.";
 
 				case 'be happy':
-					Cache::write('default', 'k-mood', 'happy');
-					return file_get_contents('http://10.0.1.52/?mood=happy');
+					// Cache::write('default', 'k-mood', 'happy');
+					// return file_get_contents('http://10.0.1.52/?mood=happy');
 					return "I am happy.";
 
 				case 'be neutral':
-					Cache::write('default', 'k-mood', 'neutral');
+					// Cache::write('default', 'k-mood', 'neutral');
 					file_get_contents('http://10.0.1.52/?mood=neutral');
 					return "I am neutral.";
 
 				case 'be angry':
-					Cache::write('default', 'k-mood', 'angry');
+					// Cache::write('default', 'k-mood', 'angry');
 					file_get_contents('http://10.0.1.52/?mood=angry');
 					return "I am angry.";
 

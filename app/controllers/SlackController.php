@@ -44,6 +44,9 @@ class SlackController extends \li3_fieldwork\extensions\action\Controller {
 			}
 
 		}
+
+		file_get_contents('http://10.0.1.52/?mood=happy');
+					return "This is a test.";
 	}
 
 }

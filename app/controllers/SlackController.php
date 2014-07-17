@@ -23,17 +23,17 @@ class SlackController extends \li3_fieldwork\extensions\action\Controller {
 
 				case 'be happy':
 					Cache::write('default', 'k-mood', 'happy');
-					file_get_contents('http://10.0.1.52/?mood=happy';
+					file_get_contents('http://10.0.1.52/?mood=happy');
 					return "I am happy.";
 
 				case 'be neutral':
 					Cache::write('default', 'k-mood', 'neutral');
-					file_get_contents('http://10.0.1.52/?mood=neutral';
+					file_get_contents('http://10.0.1.52/?mood=neutral');
 					return "I am neutral.";
 
 				case 'be angry':
 					Cache::write('default', 'k-mood', 'angry');
-					file_get_contents('http://10.0.1.52/?mood=angry';
+					file_get_contents('http://10.0.1.52/?mood=angry');
 					return "I am angry.";
 
 				case 'remind':

@@ -29,6 +29,7 @@ class SlackController extends \li3_fieldwork\extensions\action\Controller {
 					$response = json_decode($this->_postToUrl('http://printer.exciting.io/print/4h6s3f3s8v7v2h3p', $d));
 				var_dump($response);
 					if ($response['response'] === 'ok') {
+				var_dump('test');
 						return 'Printing… ' . $data;
 					}
 

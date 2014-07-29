@@ -13,13 +13,9 @@ class SlackController extends \li3_fieldwork\extensions\action\Controller {
 		if ($this->request->data) {
 			$text = trim($this->request->data['text']);
 
-			if (!$text) {
-				return 'Hello, this is Kwielford. What can I do for you?';
-			}
-
 			$commands = [
 				'help' => function($data) {
-			 		return "Some things you can ask me to do…\n\nReminders\n---------\n/kwiz remind me at 2pm to do that thing\n/kwiz remind me on thursday at 9am to do that other thing\n/kwiz remind me at 3pm on 25 aug to do that thing in the distant future.";
+			 		return file_get_contents('../resources/kwiz_help.txt');
 				},
 				'be' => function($data) {
 					// TODO: change mood
@@ -38,6 +34,10 @@ class SlackController extends \li3_fieldwork\extensions\action\Controller {
 					// TODO: implement reminders
 				}
 			];
+
+			if (!$text) {
+				return "Hello, this is Kwielford. What can I do for you?\n\n" . $commands['help']();
+			}
 
 			foreach ($commands as $key => $command) {
 				if (strpos($text, $key) === 0) {

@@ -1,0 +1,33 @@
+Some things you can ask me to do…
+
+say
+---
+
+Make me print something. Eg.:
+
+/kwiz say PRINT ME!
+
+
+Coming soon… Maybe
+==================
+
+Work in progress stuff. We want the syntax to be as quick and intuitive as possible, so please improve on this!
+
+remind me
+---------
+
+/kwiz remind me at 2pm to do that thing
+/kwiz remind me on thursday at 9am to do that other thing
+/kwiz remind me at 3pm on 25 aug to do that thing in the distant future
+
+todo
+----
+
+Show me my todo list:
+/kwiz todo
+
+Add an item to a todo list
+/kwiz todo This is something I have to do
+
+As above but tag with a project
+/kwiz todo This is something I have to do [t:Project Title]

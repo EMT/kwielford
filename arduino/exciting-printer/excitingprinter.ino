@@ -293,9 +293,9 @@ inline void printFromDownload() {
 void loop() {
   if (downloadWaiting) {
     bouncer.update();
-    if (bouncer.read() == HIGH) {
+    //if (bouncer.read() == HIGH) {
       printFromDownload();
-    }
+    //}
   } else {
     checkForDownload();
     if (!downloadWaiting) {

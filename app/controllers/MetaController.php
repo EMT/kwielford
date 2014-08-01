@@ -41,6 +41,10 @@ class MetaController extends \li3_fieldwork\extensions\action\Controller {
 		return compact('mood');
 	}
 
+	public function face() {
+		return ['face' => Faces::faceForMood(MoodMetrics::currentMood())];
+	}
+
 	public function initMood() {
 		$mood = MoodMetrics::create()->save([
 			'energy' => 50,

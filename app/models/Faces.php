@@ -4,6 +4,11 @@ namespace app\models;
 
 class Faces extends \lithium\data\Model {
 
+    protected $_schema = array(
+        'id'  => array('type' => 'id'),
+        'face' => array('type' => 'string', 'null' => false)
+    );
+
     public static $_faces = [
         [
             '00000000000000000000000000000000',
@@ -38,7 +43,21 @@ class Faces extends \lithium\data\Model {
     ];
 
 	public static function faceForMood($mood) {
-        return static::$_faces[rand(0, count(static::$_faces) - 1)];
+        $face = Faces::create();
+        $face->face = static::$_faces[rand(0, count(static::$_faces) - 1)];
+        return $face;
+    }
+
+    public function forArduino($entity) {
+        if ($entity->face) {
+            $arduino_face = [[], [], [], []];
+            foreach ($entity->face as $key => $row) {
+                for ($i = 0; $i < 4; $i ++) {
+                    $arduino_face[$i][$key] = 'B' . substr($row, $i * 8, 8);
+                }
+            }
+            return $arduino_face;
+        }
     }
 }
 

@@ -13,29 +13,31 @@ class SlackController extends \li3_fieldwork\extensions\action\Controller {
 		if ($this->request->data) {
 			$text = trim($this->request->data['text']);
 
-			if (!$text) {
-				return 'Hello, this is Kwielford. What can I do for you?';
-			}
-
 			$commands = [
 				'help' => function($data) {
-			 		return "Some things you can ask me to do…\n\nReminders\n---------\n/kwiz remind me at 2pm to do that thing\n/kwiz remind me on thursday at 9am to do that other thing\n/kwiz remind me at 3pm on 25 aug to do that thing in the distant future.";
+			 		return file_get_contents('../resources/kwiz_help.txt');
 				},
 				'be' => function($data) {
 					// TODO: change mood
 				},
 				'say' => function($data) {
 					$d = ['content' => '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Document</title></head><body>' . $data . '</body></html>'];
-					$response = $this->_postToUrl('http://printer.exciting.io/print/4h6s3f3s8v7v2h3p', $d);
-					var_dump($response);
-					if ($response['response'] === 'ok') {
+					$response = json_decode($this->_postToUrl('http://printer.exciting.io/print/4h6s3f3s8v7v2h3p', $d));
+
+					if ($response->response === 'ok') {
 						return 'Printing… ' . $data;
 					}
+
+					return 'Something is wrong. My mouth won’t work.';
 				},
 				'remind' => function($data) {
 					// TODO: implement reminders
 				}
 			];
+
+			if (!$text) {
+				return "Hello, this is Kwielford. What can I do for you?\n\n" . $commands['help']();
+			}
 
 			foreach ($commands as $key => $command) {
 				if (strpos($text, $key) === 0) {
@@ -88,7 +90,8 @@ class SlackController extends \li3_fieldwork\extensions\action\Controller {
 		// use key 'http' even if you send the request to https://...
 		$options = array(
 		    'http' => array(
-		        'header'  => "Content-type: application/json\r\n",
+		        'header'  => "Content-type: application/x-www-form-urlencoded\r\n" . 
+		        			"Accept: application/json\r\n",
 		        'method'  => 'POST',
 		        'content' => http_build_query($data),
 		    ),

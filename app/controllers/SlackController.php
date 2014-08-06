@@ -22,7 +22,7 @@ class SlackController extends \li3_fieldwork\extensions\action\Controller {
 				},
 				'say' => function($data) {
 					$d = ['content' => '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Document</title></head><body>' . $data . '</body></html>'];
-					$response = json_decode($this->_postToUrl('http://printer.exciting.io/print/4h6s3f3s8v7v2h3p', $d));
+					$response = json_decode($this->_postToUrl('http://printer.exciting.io/print/6d7p2j7o6i8u3q5r', $d));
 
 					if ($response->response === 'ok') {
 						return 'Printing… ' . $data;

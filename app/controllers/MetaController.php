@@ -42,7 +42,13 @@ class MetaController extends \li3_fieldwork\extensions\action\Controller {
 	}
 
 	public function face() {
-		return ['face' => Faces::faceForMood(MoodMetrics::currentMood())];
+		$face = Faces::faceForMood(MoodMetrics::currentMood());
+		
+		if (!empty($this->request->query['mode']) && $this->request->query['mode'] === 'arduino') {
+			return ['face' => $face->forArduino()];
+		}
+
+		return ['face' => $face->data()];
 	}
 
 	public function initMood() {

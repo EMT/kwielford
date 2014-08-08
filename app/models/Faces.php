@@ -49,15 +49,16 @@ class Faces extends \lithium\data\Model {
 	public static function faceForMood($mood) {
         $face = Faces::create();
         $face->face = static::$_faces[rand(0, count(static::$_faces) - 1)];
+        // $face->face = static::$_faces[0];
         return $face;
     }
 
     public function forArduino($entity) {
         if ($entity->face) {
-            $arduino_face = [[], [], [], []];
+            $arduino_face = [];
             foreach ($entity->face as $key => $row) {
                 for ($i = 0; $i < 4; $i ++) {
-                    $arduino_face[$i][$key] = bindec(substr($row, $i * 8, 8));
+                    $arduino_face[] = bindec(substr($row, $i * 8, 8));
                 }
             }
             return $arduino_face;

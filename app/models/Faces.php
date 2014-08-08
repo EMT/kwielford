@@ -57,7 +57,7 @@ class Faces extends \lithium\data\Model {
             $arduino_face = [[], [], [], []];
             foreach ($entity->face as $key => $row) {
                 for ($i = 0; $i < 4; $i ++) {
-                    $arduino_face[$i][$key] = pack('B' . substr($row, $i * 8, 8));
+                    $arduino_face[$i][$key] = bindec(substr($row, $i * 8, 8));
                 }
             }
             return $arduino_face;

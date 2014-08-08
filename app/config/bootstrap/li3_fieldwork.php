@@ -48,7 +48,7 @@ Access::setRules([
 
 Email::config([
     'mandrill_api_key' => 'zlVDcAzsFLbqFh0rnMzsQA',
-    'from_name' => 'Big Street Survey',
+    'from_name' => 'Kwielford',
     'from_email' => 'messages@madebyfieldwork.com',
     'template_dir' => __DIR__ . '/../../views/email/'
 ]);

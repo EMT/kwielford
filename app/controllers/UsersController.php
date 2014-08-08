@@ -13,7 +13,7 @@ class UsersController extends \li3_auth\controllers\UsersController {
 	}
 
 	public function view() {
-		$user = Users::first($this->request->id);
+		$user = Users::findById($this->request->id);
 		return compact('user');
 	}
 
@@ -21,20 +21,23 @@ class UsersController extends \li3_auth\controllers\UsersController {
 		$user = Users::create();
 
 		if (($this->request->data) && $user->save($this->request->data)) {
-			return $this->redirect(array('Users::view', 'args' => array($user->id)));
+			return $this->redirect(['Users::view', 'id' => $user->id]);
 		}
+
 		return compact('user');
 	}
 
 	public function edit() {
-		$user = Users::find($this->request->id);
+		$user = Users::findById($this->request->id);
 
 		if (!$user) {
 			return $this->redirect('Users::index');
 		}
+
 		if (($this->request->data) && $user->save($this->request->data)) {
-			return $this->redirect(array('Users::view', 'args' => array($user->id)));
+			return $this->redirect(['Users::view', 'id' => $user->id]);
 		}
+
 		return compact('user');
 	}
 
@@ -43,7 +46,8 @@ class UsersController extends \li3_auth\controllers\UsersController {
 			$msg = "Users::delete can only be called with http:post or http:delete.";
 			throw new DispatchException($msg);
 		}
-		Users::find($this->request->id)->delete();
+
+		Users::findById($this->request->id)->delete();
 		return $this->redirect('Users::index');
 	}
 }

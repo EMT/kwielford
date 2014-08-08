@@ -48,8 +48,8 @@ class Faces extends \lithium\data\Model {
 
 	public static function faceForMood($mood) {
         $face = Faces::create();
-        $face->face = static::$_faces[rand(0, count(static::$_faces) - 1)];
-        // $face->face = static::$_faces[0];
+        // $face->face = static::$_faces[rand(0, count(static::$_faces) - 1)];
+        $face->face = static::$_faces[0];
         return $face;
     }
 

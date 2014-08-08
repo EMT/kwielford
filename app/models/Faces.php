@@ -4,10 +4,14 @@ namespace app\models;
 
 class Faces extends \lithium\data\Model {
 
-    protected $_schema = array(
-        'id'  => array('type' => 'id'),
-        'face' => array('type' => 'string', 'null' => false)
-    );
+    protected $_meta = [
+        'connection' => 'mongodb'
+    ];
+
+    // protected $_schema = array(
+    //     '_id'  => array('type' => 'id'),
+    //     'face' => array('type' => 'string', 'null' => false)
+    // );
 
     public static $_faces = [
         [
@@ -53,7 +57,7 @@ class Faces extends \lithium\data\Model {
             $arduino_face = [[], [], [], []];
             foreach ($entity->face as $key => $row) {
                 for ($i = 0; $i < 4; $i ++) {
-                    $arduino_face[$i][$key] = 'B' . substr($row, $i * 8, 8);
+                    $arduino_face[$i][$key] = pack('B' . substr($row, $i * 8, 8));
                 }
             }
             return $arduino_face;

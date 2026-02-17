@@ -2,6 +2,10 @@
 
 Status date: 2026-02-17
 
+Channel boundary note:
+- Slack is the current adapter for this slice.
+- The end-state architecture for this flow is documented in `docs/channel-agnostic-architecture.md`.
+
 This vertical slice scaffolds the end-to-end flow:
 
 1. Slack command accepted quickly (`ack` behavior).
@@ -18,8 +22,8 @@ This vertical slice scaffolds the end-to-end flow:
   - `packages/core/src/tasks/thread-summary.ts`
 - DB repositories:
   - `packages/db/src/repositories.ts`
-- Slack orchestration:
-  - `apps/slack/src/flows/thread-summary-flow.ts`
+- Application orchestration:
+  - `packages/app/src/thread-summary-flow.ts`
 - Slack API/signature adapters:
   - `apps/slack/src/adapters/slack-web-api.ts`
   - `apps/slack/src/security/verify-slack-signature.ts`
@@ -29,13 +33,24 @@ This vertical slice scaffolds the end-to-end flow:
   - `apps/api/src/adapters/vercel-workflow-thread-summary-dispatcher.ts`
   - `apps/api/src/workflows/thread-summary-workflow.ts`
 
+## Boundary mapping (current)
+
+- Application service:
+  - `packages/app/src/thread-summary-flow.ts`
+- Slack adapter:
+  - `apps/slack/src/adapters/slack-web-api.ts`
+  - `apps/slack/src/security/verify-slack-signature.ts`
+  - `apps/slack/src/parsers/slash-command.ts`
+- Runtime delivery:
+  - `apps/api/app/api/slack/thread-summary/route.ts`
+
 ## Integration Interfaces
 
 The flow is intentionally adapter-based to keep business logic testable:
 
 - `ThreadSummaryWorkflowDispatcher`
 - `ThreadSummaryMessageFetcher`
-- `ThreadSummarySlackResponder`
+- `ThreadSummaryResponder`
 
 Implemented with:
 

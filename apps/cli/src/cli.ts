@@ -2,7 +2,7 @@
 
 import { readFile } from "node:fs/promises";
 
-import { formatThreadSummaryForSlack, summarizeThread, type ThreadMessage } from "@kwielford/core";
+import { formatThreadSummaryText, summarizeThread, type ThreadMessage } from "@kwielford/core";
 import { createAgentRun, createAuditEvent, createDb, createMessage, updateAgentRunState } from "@kwielford/db";
 
 interface ParsedArgs {
@@ -213,7 +213,7 @@ export async function runCli(argv: string[]): Promise<number> {
       blockers: summary.blockers,
       nextActions: summary.nextActions
     };
-    const summaryText = formatThreadSummaryForSlack(summary);
+    const summaryText = formatThreadSummaryText(summary);
     const runId = await maybePersistRun({
       workspaceId: parsed.workspaceId,
       userId: parsed.userId,

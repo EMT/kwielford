@@ -14,6 +14,7 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
+    "@kwielford/app": "workspace:*",
     "@kwielford/config": "workspace:*",
     "@kwielford/core": "workspace:*",
     "@kwielford/db": "workspace:*",

@@ -2,6 +2,9 @@
 
 API and workflow integration package for Kwielford.
 
+Architecture reference:
+- `docs/channel-agnostic-architecture.md` defines Slack as a channel adapter and the cross-channel boundaries.
+
 ## Thread summary slash command
 
 Primary handler:
@@ -35,6 +38,10 @@ Dispatcher implementation:
 - `SLACK_BOT_TOKEN`
 - `SLACK_ALLOWED_COMMANDS` (optional)
 - `DEFAULT_WORKSPACE_ID` (optional)
+- `AI_GATEWAY_API_KEY` (optional, enables LLM thread summarization)
+- `AI_GATEWAY_MODEL` (optional, default: `openai/gpt-4.1-mini`)
+- `AI_GATEWAY_BASE_URL` (optional, default: `https://ai-gateway.vercel.sh/v1`)
+- `AI_SUMMARY_TIMEOUT_MS` (optional, default: `20000`)
 
 ## Scripts
 

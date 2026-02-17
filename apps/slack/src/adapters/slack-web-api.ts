@@ -1,9 +1,5 @@
+import type { ThreadSummaryMessageFetcher, ThreadSummaryResponder } from "@kwielford/app";
 import type { ThreadMessage } from "@kwielford/core";
-
-import type {
-  ThreadSummaryMessageFetcher,
-  ThreadSummarySlackResponder
-} from "../flows/thread-summary-flow.js";
 
 interface SlackApiResponseBase {
   ok: boolean;
@@ -48,7 +44,7 @@ function asErrorMessage(response: SlackApiResponseBase, status: number): string 
   return response.error ? `Slack API error (${status}): ${response.error}` : `Slack API error (${status})`;
 }
 
-export class SlackWebApiAdapter implements ThreadSummaryMessageFetcher, ThreadSummarySlackResponder {
+export class SlackWebApiAdapter implements ThreadSummaryMessageFetcher, ThreadSummaryResponder {
   private readonly botToken: string;
 
   public constructor(options: SlackWebApiAdapterOptions) {

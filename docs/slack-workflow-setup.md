@@ -45,6 +45,10 @@ Optional:
 
 - `SLACK_ALLOWED_COMMANDS` (default: `/kwielford-summary`)
 - `DEFAULT_WORKSPACE_ID` (fallback workspace if team mapping is not in DB)
+- `AI_GATEWAY_API_KEY` (enable LLM summarization through Vercel AI Gateway)
+- `AI_GATEWAY_MODEL` (default: `openai/gpt-4.1-mini`)
+- `AI_GATEWAY_BASE_URL` (default: `https://ai-gateway.vercel.sh/v1`)
+- `AI_SUMMARY_TIMEOUT_MS` (default: `20000`)
 
 ## Deploy route structure (Vercel + Next.js)
 

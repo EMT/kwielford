@@ -1,7 +1,8 @@
 import {
-  formatThreadSummaryForSlack,
+  formatThreadSummaryText,
   summarizeThread,
   type ThreadMessage,
+  type ThreadSummaryInput,
   type ThreadSummaryOutput
 } from "@kwielford/core";
 import {
@@ -9,7 +10,9 @@ import {
   createAuditEvent,
   createMessage,
   updateAgentRunState,
-  type DbClient
+  type AuditActorType,
+  type DbClient,
+  type MessageSource
 } from "@kwielford/db";
 
 export interface ThreadSummaryCommandPayload {
@@ -17,6 +20,8 @@ export interface ThreadSummaryCommandPayload {
   channelId: string;
   threadTs: string;
   commandId: string;
+  triggerSource: MessageSource;
+  actorType: AuditActorType;
   initiatedByUserId?: string;
   actorId?: string;
 }
@@ -31,6 +36,7 @@ export interface ThreadSummaryJobPayload {
   workspaceId: string;
   channelId: string;
   threadTs: string;
+  outputSource: MessageSource;
   initiatedByUserId?: string;
   actorId?: string;
 }
@@ -47,7 +53,7 @@ export interface ThreadSummaryWorkflowDispatcher {
   enqueueThreadSummaryJob(job: ThreadSummaryJobPayload): Promise<void>;
 }
 
-export interface ThreadSummarySlackResponder {
+export interface ThreadSummaryResponder {
   postThreadReply(input: {
     channelId: string;
     threadTs: string;
@@ -63,8 +69,18 @@ export interface ThreadSummaryFlowDeps {
 export interface ThreadSummaryJobDeps {
   db: DbClient;
   fetcher: ThreadSummaryMessageFetcher;
-  responder: ThreadSummarySlackResponder;
+  responder: ThreadSummaryResponder;
+  formatter?: ThreadSummaryResultFormatter;
+  summarizer?: ThreadSummaryJobSummarizer;
 }
+
+export type ThreadSummaryJobSummarizer = (
+  input: ThreadSummaryInput
+) => Promise<ThreadSummaryOutput>;
+
+export type ThreadSummaryResultFormatter = (
+  output: ThreadSummaryOutput
+) => string;
 
 function toErrorMessage(error: unknown): string {
   if (error instanceof Error) {
@@ -81,9 +97,9 @@ export async function handleThreadSummaryCommand(
   const run = await createAgentRun(deps.db, {
     workspaceId: payload.workspaceId,
     initiatedByUserId: payload.initiatedByUserId,
-    triggerSource: "slack",
+    triggerSource: payload.triggerSource,
     taskKind: "thread_summary",
-    idempotencyKey: `slack:${payload.commandId}`,
+    idempotencyKey: `${payload.triggerSource}:${payload.commandId}`,
     input: {
       channelId: payload.channelId,
       threadTs: payload.threadTs,
@@ -95,7 +111,7 @@ export async function handleThreadSummaryCommand(
     workspaceId: payload.workspaceId,
     runId: run.id,
     userId: payload.initiatedByUserId,
-    actorType: "slack",
+    actorType: payload.actorType,
     actorId: payload.actorId,
     eventName: "thread_summary.command_received",
     eventData: {
@@ -110,6 +126,7 @@ export async function handleThreadSummaryCommand(
     workspaceId: payload.workspaceId,
     channelId: payload.channelId,
     threadTs: payload.threadTs,
+    outputSource: payload.triggerSource,
     initiatedByUserId: payload.initiatedByUserId,
     actorId: payload.actorId
   });
@@ -136,11 +153,29 @@ export async function runThreadSummaryJob(
       threadTs: payload.threadTs
     });
 
-    const summary = summarizeThread({
+    const summaryInput: ThreadSummaryInput = {
       channelId: payload.channelId,
       threadTs: payload.threadTs,
       messages
-    });
+    };
+    const summary =
+      deps.summarizer
+        ? await deps.summarizer(summaryInput).catch(async (error) => {
+            const message = toErrorMessage(error);
+            await createAuditEvent(deps.db, {
+              workspaceId: payload.workspaceId,
+              runId: payload.runId,
+              userId: payload.initiatedByUserId,
+              actorType: "system",
+              eventName: "thread_summary.llm_fallback",
+              eventData: {
+                error: message
+              }
+            });
+
+            return summarizeThread(summaryInput);
+          })
+        : summarizeThread(summaryInput);
     const summaryPayload: Record<string, unknown> = {
       summary: summary.summary,
       decisions: summary.decisions,
@@ -148,17 +183,17 @@ export async function runThreadSummaryJob(
       nextActions: summary.nextActions
     };
 
-    const slackText = formatThreadSummaryForSlack(summary);
+    const summaryText = deps.formatter ? deps.formatter(summary) : formatThreadSummaryText(summary);
 
     await createMessage(deps.db, {
       workspaceId: payload.workspaceId,
       runId: payload.runId,
       userId: payload.initiatedByUserId,
-      source: "slack",
+      source: payload.outputSource,
       role: "assistant",
       channelId: payload.channelId,
       threadTs: payload.threadTs,
-      content: slackText,
+      content: summaryText,
       payload: summaryPayload
     });
 
@@ -186,7 +221,7 @@ export async function runThreadSummaryJob(
     await deps.responder.postThreadReply({
       channelId: payload.channelId,
       threadTs: payload.threadTs,
-      text: slackText
+      text: summaryText
     });
 
     return summary;

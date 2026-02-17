@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 
+import { handleThreadSummaryCommand } from "@kwielford/app";
 import { createDb, getUserBySlackUserId, getWorkspaceBySlackTeamId } from "@kwielford/db";
 import {
   extractThreadReference,
-  handleThreadSummaryCommand,
   SlackWebApiAdapter,
   verifySlackSignature
 } from "@kwielford/slack";
@@ -534,6 +534,8 @@ async function handleAssistantMessageEvent(input: {
       channelId: targetChannelId,
       threadTs: targetThreadTs,
       commandId,
+      triggerSource: "slack",
+      actorType: "slack",
       initiatedByUserId,
       actorId: readString(input.event.user)
     }

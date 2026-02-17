@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 
+import { handleThreadSummaryCommand } from "@kwielford/app";
 import { createDb, getUserBySlackUserId, getWorkspaceBySlackTeamId } from "@kwielford/db";
 import {
   extractThreadReference,
-  handleThreadSummaryCommand,
   parseSlashCommandFormBody,
   verifySlackSignature
 } from "@kwielford/slack";
@@ -159,6 +159,8 @@ export async function handleSlackThreadSummaryCommandRequest(request: Request): 
         channelId: resolved.channelId,
         threadTs: resolved.threadTs,
         commandId,
+        triggerSource: "slack",
+        actorType: "slack",
         initiatedByUserId,
         actorId: form.user_id
       }

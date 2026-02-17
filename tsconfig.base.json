@@ -3,6 +3,16 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "baseUrl": ".",
+    "paths": {
+      "@kwielford/app": ["packages/app/src/index.ts"],
+      "@kwielford/config": ["packages/config/src/index.ts"],
+      "@kwielford/core": ["packages/core/src/index.ts"],
+      "@kwielford/db": ["packages/db/src/index.ts"],
+      "@kwielford/slack": ["apps/slack/src/index.ts"],
+      "@kwielford/api": ["apps/api/src/index.ts"],
+      "@kwielford/cli": ["apps/cli/src/index.ts"]
+    },
     "lib": ["ES2022"],
     "strict": true,
     "skipLibCheck": true,

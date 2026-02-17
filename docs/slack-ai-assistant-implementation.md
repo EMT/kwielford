@@ -2,6 +2,9 @@
 
 Status date: 2026-02-17
 
+This document covers the Slack adapter implementation only.
+For the product-level architecture boundary, see `docs/channel-agnostic-architecture.md`.
+
 This repo now supports Slack AI app events via:
 
 - `apps/api/app/api/slack/assistant/events/route.ts`
@@ -24,7 +27,10 @@ This repo now supports Slack AI app events via:
    - if permalink is present, resolves workspace by Slack `team_id` (or `DEFAULT_WORKSPACE_ID`),
    - queues existing thread-summary workflow,
    - replies in assistant thread with run id.
-7. Workflow posts the final summary back into the source Slack thread.
+7. Workflow summary generation:
+   - uses Vercel AI Gateway through AI SDK when `AI_GATEWAY_API_KEY` is set,
+   - falls back to deterministic summary extraction if LLM call fails.
+8. Workflow posts the final summary back into the source Slack thread.
 
 ## Minimal Bolt skeleton (optional alternative)
 

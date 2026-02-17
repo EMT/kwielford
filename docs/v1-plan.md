@@ -10,10 +10,15 @@ Goal: establish a single planning source of truth in the repo.
 - Create this document as the initial execution plan.
 - Keep key decisions here before they are codified.
 - Maintain cross-platform naming and scope details in `docs/project-context.md`.
+- Maintain channel-agnostic architecture boundaries in `docs/channel-agnostic-architecture.md`.
 
 ## 1) Define v1 Scope (Initial Proposal)
 
 Goal: launch a useful first version for Fieldwork operations through Slack + CLI.
+
+Architecture rule for v1:
+- Slack is the first channel adapter, not the product boundary.
+- Core assistant capabilities must remain reusable by additional channels.
 
 ### v1 Tasks (3)
 
@@ -59,6 +64,7 @@ apps/
   cli/        # Operator/admin command surface
   api/        # Shared HTTP endpoints/webhooks (if needed outside slack app)
 packages/
+  app/        # Channel-agnostic application orchestration/use-case flows
   core/       # Agent orchestration, prompt/tool registry, task runners
   db/         # Drizzle schema, migrations, query layer
   config/     # Env parsing/validation, shared typed config
@@ -68,10 +74,14 @@ docs/
 
 ### Package Responsibilities
 
+- `packages/app`
+  - Channel-agnostic use-case orchestration and task flow contracts.
+  - Adapter interfaces for dispatch, fetch, and response operations.
+
 - `packages/core`
   - Task contracts and execution pipeline.
   - Shared run state model.
-  - Reusable formatting logic for Slack and CLI outputs.
+  - Channel-neutral summarization and formatting helpers.
 
 - `packages/db`
   - Drizzle schema and migrations for Neon Postgres.
@@ -82,8 +92,8 @@ docs/
 
 - `apps/slack`
   - Slack app entrypoints.
-  - Fast ack -> async workflow handoff pattern.
-  - Reply posting and retry-safe idempotency.
+  - Slack protocol parsing/signature verification and Web API integration.
+  - Slack-specific presentation formatting and assistant UX calls.
 
 - `apps/cli`
   - Commands to run tasks, check status, and inspect outputs.
@@ -114,7 +124,7 @@ docs/
 
 - Added shared thread summarization task logic in `packages/core`.
 - Added DB repository helpers for run lifecycle, messages, and audit events in `packages/db`.
-- Added Slack flow module with:
+- Added application flow module with:
   - Fast command handling (`handleThreadSummaryCommand`) that queues async job payloads.
   - Async job executor (`runThreadSummaryJob`) that writes run status, output, message, and audit records.
 - Added Slack integration adapters:

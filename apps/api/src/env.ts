@@ -6,6 +6,10 @@ export interface ApiConfig {
   slackBotToken: string;
   allowedSlashCommands: string[];
   defaultWorkspaceId?: string;
+  aiGatewayApiKey?: string;
+  aiGatewayModel: string;
+  aiGatewayBaseUrl: string;
+  aiSummaryTimeoutMs: number;
 }
 
 function getRequiredEnv(name: string): string {
@@ -32,6 +36,19 @@ function parseAllowedCommands(raw: string | undefined): string[] {
     .filter((item) => item.length > 0);
 }
 
+function parsePositiveInt(raw: string | undefined, defaultValue: number): number {
+  if (!raw) {
+    return defaultValue;
+  }
+
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return defaultValue;
+  }
+
+  return parsed;
+}
+
 export function getApiConfig(): ApiConfig {
   const runtime = getRuntimeConfig();
 
@@ -40,6 +57,10 @@ export function getApiConfig(): ApiConfig {
     slackSigningSecret: getRequiredEnv("SLACK_SIGNING_SECRET"),
     slackBotToken: getRequiredEnv("SLACK_BOT_TOKEN"),
     allowedSlashCommands: parseAllowedCommands(getOptionalEnv("SLACK_ALLOWED_COMMANDS")),
-    defaultWorkspaceId: getOptionalEnv("DEFAULT_WORKSPACE_ID")
+    defaultWorkspaceId: getOptionalEnv("DEFAULT_WORKSPACE_ID"),
+    aiGatewayApiKey: getOptionalEnv("AI_GATEWAY_API_KEY"),
+    aiGatewayModel: getOptionalEnv("AI_GATEWAY_MODEL") ?? "openai/gpt-4.1-mini",
+    aiGatewayBaseUrl: getOptionalEnv("AI_GATEWAY_BASE_URL") ?? "https://ai-gateway.vercel.sh/v1",
+    aiSummaryTimeoutMs: parsePositiveInt(getOptionalEnv("AI_SUMMARY_TIMEOUT_MS"), 20_000)
   };
 }

@@ -1,6 +1,6 @@
 import { start } from "workflow/api";
 
-import type { ThreadSummaryJobPayload, ThreadSummaryWorkflowDispatcher } from "@kwielford/slack";
+import type { ThreadSummaryJobPayload, ThreadSummaryWorkflowDispatcher } from "@kwielford/app";
 
 import { threadSummaryWorkflow } from "../workflows/thread-summary-workflow.js";
 

@@ -2,6 +2,10 @@
 
 Status date: 2026-02-17
 
+Project/team naming note:
+- GitHub org is `EMT` while Vercel team scope is `fieldwork`.
+- See `docs/project-context.md` for canonical platform identifiers.
+
 ## What is implemented
 
 - Slash command verification and parsing.
@@ -11,11 +15,17 @@ Status date: 2026-02-17
   - summarizes the thread,
   - writes run/message/audit records,
   - posts a reply to the same thread.
+- Assistant events endpoint for Slack AI Apps that:
+  - handles Slack URL verification,
+  - initializes assistant thread prompts/title,
+  - accepts `message.im` events and queues thread summaries from permalinks.
 
 ## Key modules
 
 - Command route handler:
   - `apps/api/src/routes/slack-thread-summary-command.ts`
+- Assistant events route handler:
+  - `apps/api/src/routes/slack-assistant-events.ts`
 - Vercel Workflow dispatcher:
   - `apps/api/src/adapters/vercel-workflow-thread-summary-dispatcher.ts`
 - Workflow function:
@@ -41,12 +51,14 @@ Optional:
 Route files:
 
 - `apps/api/app/api/slack/thread-summary/route.ts`
+- `apps/api/app/api/slack/assistant/events/route.ts`
 - `apps/api/app/api/health/route.ts`
 - `apps/api/next.config.ts` (`withWorkflow(...)` enabled)
 
 Deploy `apps/api` as a Vercel project. The slash command URL should be:
 
 - `https://<your-domain>/api/slack/thread-summary`
+- `https://<your-domain>/api/slack/assistant/events` (AI app events + URL verification)
 
 ## Slack app setup
 
@@ -56,6 +68,39 @@ Deploy `apps/api` as a Vercel project. The slash command URL should be:
    - `channels:history` (or matching conversation history scope)
    - `chat:write`
 4. Install/reinstall app to workspace and copy bot token.
+
+## Slack AI app setup
+
+Use the manifest template:
+
+- `apps/slack/manifest.ai-assistant.yaml`
+
+Before applying the manifest, replace:
+
+- `redirect_urls[0]`
+- `settings.event_subscriptions.request_url`
+- `settings.interactivity.request_url`
+
+Required bot scopes for assistant flow:
+
+- `assistant:write`
+- `chat:write`
+- `channels:history`
+- `groups:history`
+- `im:history`
+- `mpim:history`
+
+Required bot events:
+
+- `assistant_thread_started`
+- `assistant_thread_context_changed`
+- `message.im`
+
+Current assistant behavior:
+
+- In the assistant thread, send a thread permalink.
+- The assistant queues the same thread-summary workflow used by the slash command.
+- Summary output is posted back into the original Slack thread.
 
 ## Vercel routing note
 
@@ -84,6 +129,12 @@ The slash command input must include either:
 The helper script signs a form-encoded slash command payload and posts it to:
 
 - `http://localhost:3000/api/slack/thread-summary` (override with `TEST_URL`)
+
+Local assistant event test:
+
+- `SLACK_SIGNING_SECRET=<your-secret> pnpm --filter @kwielford/api test:assistant-event`
+- Default target URL:
+  - `http://localhost:3000/api/slack/assistant/events` (override with `TEST_URL`)
 
 ## Next integration step
 

@@ -1,5 +1,6 @@
 import { getCoreHealth } from "@kwielford/core";
 export * from "./adapters/vercel-workflow-thread-summary-dispatcher.js";
+export * from "./routes/slack-assistant-events.js";
 export * from "./routes/slack-thread-summary-command.js";
 export * from "./vercel-routes/slack-thread-summary-command.js";
 export * from "./workflows/thread-summary-workflow.js";

@@ -29,8 +29,19 @@ interface ChatPostMessageResponse extends SlackApiResponseBase {
   ts?: string;
 }
 
+interface AssistantThreadSetTitleResponse extends SlackApiResponseBase {}
+
+interface AssistantThreadSetStatusResponse extends SlackApiResponseBase {}
+
+interface AssistantThreadSetSuggestedPromptsResponse extends SlackApiResponseBase {}
+
 export interface SlackWebApiAdapterOptions {
   botToken: string;
+}
+
+export interface SlackAssistantThreadSuggestedPrompt {
+  title: string;
+  message: string;
 }
 
 function asErrorMessage(response: SlackApiResponseBase, status: number): string {
@@ -114,5 +125,44 @@ export class SlackWebApiAdapter implements ThreadSummaryMessageFetcher, ThreadSu
       unfurl_links: false,
       unfurl_media: false
     });
+  }
+
+  public async setAssistantThreadTitle(input: {
+    channelId: string;
+    threadTs: string;
+    title: string;
+  }): Promise<void> {
+    await this.callSlackApi<AssistantThreadSetTitleResponse>("assistant.threads.setTitle", {
+      channel_id: input.channelId,
+      thread_ts: input.threadTs,
+      title: input.title
+    });
+  }
+
+  public async setAssistantThreadStatus(input: {
+    channelId: string;
+    threadTs: string;
+    status: string;
+  }): Promise<void> {
+    await this.callSlackApi<AssistantThreadSetStatusResponse>("assistant.threads.setStatus", {
+      channel_id: input.channelId,
+      thread_ts: input.threadTs,
+      status: input.status
+    });
+  }
+
+  public async setAssistantThreadSuggestedPrompts(input: {
+    channelId: string;
+    threadTs: string;
+    prompts: SlackAssistantThreadSuggestedPrompt[];
+  }): Promise<void> {
+    await this.callSlackApi<AssistantThreadSetSuggestedPromptsResponse>(
+      "assistant.threads.setSuggestedPrompts",
+      {
+        channel_id: input.channelId,
+        thread_ts: input.threadTs,
+        prompts: input.prompts
+      }
+    );
   }
 }

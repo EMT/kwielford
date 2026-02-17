@@ -8,6 +8,12 @@ Primary handler:
 
 - `src/routes/slack-thread-summary-command.ts`
 
+## Slack AI assistant events
+
+Primary handler:
+
+- `src/routes/slack-assistant-events.ts`
+
 Vercel-style wrapper (re-exported):
 
 - `src/vercel-routes/slack-thread-summary-command.ts`
@@ -35,3 +41,4 @@ Dispatcher implementation:
 - `pnpm --filter @kwielford/api dev`
 - `pnpm --filter @kwielford/api build`
 - `pnpm --filter @kwielford/api test:slash-command`
+- `pnpm --filter @kwielford/api test:assistant-event`

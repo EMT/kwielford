@@ -10,6 +10,7 @@
     "dev": "next dev",
     "start": "next start",
     "test:slash-command": "node scripts/mock-slack-command.mjs",
+    "test:assistant-event": "node scripts/mock-slack-assistant-event.mjs",
     "typecheck": "tsc -b"
   },
   "dependencies": {

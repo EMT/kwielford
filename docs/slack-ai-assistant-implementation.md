@@ -1,0 +1,72 @@
+# Slack AI Assistant Implementation
+
+Status date: 2026-02-17
+
+This repo now supports Slack AI app events via:
+
+- `apps/api/app/api/slack/assistant/events/route.ts`
+- `apps/api/src/routes/slack-assistant-events.ts`
+
+## Event flow
+
+1. Slack sends `POST /api/slack/assistant/events`.
+2. Request signature is verified (`x-slack-signature`, `x-slack-request-timestamp`).
+3. `url_verification` payloads return `{ "challenge": ... }`.
+4. `assistant_thread_started` and `assistant_thread_context_changed`:
+   - store assistant-thread context (best effort, in-memory),
+   - set assistant thread title,
+   - set suggested prompts.
+5. `message.im`:
+   - ignores bot messages,
+   - parses user text for thread permalink/timestamp,
+   - resolves workspace by Slack `team_id` (or `DEFAULT_WORKSPACE_ID`),
+   - queues existing thread-summary workflow,
+   - replies in assistant thread with run id.
+6. Workflow posts the final summary back into the source Slack thread.
+
+## Minimal Bolt skeleton (optional alternative)
+
+```ts
+import { App } from "@slack/bolt";
+
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  token: process.env.SLACK_BOT_TOKEN
+});
+
+app.event("assistant_thread_started", async ({ event, client }) => {
+  await client.assistant.threads.setTitle({
+    channel_id: event.assistant_thread.channel_id,
+    thread_ts: event.assistant_thread.thread_ts,
+    title: "Kwielford assistant"
+  });
+
+  await client.assistant.threads.setSuggestedPrompts({
+    channel_id: event.assistant_thread.channel_id,
+    thread_ts: event.assistant_thread.thread_ts,
+    prompts: [
+      {
+        title: "Summarize a thread",
+        message:
+          "Summarize this thread https://fieldwork.slack.com/archives/C123456/p1739999999000100?thread_ts=1739999999.000100&cid=C123456"
+      }
+    ]
+  });
+});
+
+app.event("message", async ({ event, client }) => {
+  if (event.channel_type !== "im" || event.subtype === "bot_message") {
+    return;
+  }
+
+  await client.assistant.threads.setStatus({
+    channel_id: event.channel,
+    thread_ts: event.thread_ts ?? event.ts,
+    status: "Queuing thread summary..."
+  });
+
+  // Parse permalink and queue the same workflow used in this repo.
+});
+```
+
+Use this Bolt example only if you later move from the Next.js route handler model to a Bolt runtime.

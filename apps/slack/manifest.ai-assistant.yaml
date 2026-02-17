@@ -1,0 +1,41 @@
+_metadata:
+  major_version: 1
+  minor_version: 1
+display_information:
+  name: Kwielford
+  description: Summarize Slack threads into decisions, blockers, and next actions.
+  background_color: "#1f2937"
+features:
+  bot_user:
+    display_name: Kwielford
+    always_online: false
+  assistant_view:
+    assistant_description: Summarize Slack threads and post structured output back to the source thread.
+    suggested_prompts:
+      - title: Summarize a thread
+        message: Summarize this thread https://fieldwork.slack.com/archives/C123456/p1739999999000100?thread_ts=1739999999.000100&cid=C123456
+      - title: How to use this
+        message: How do I use this assistant?
+oauth_config:
+  redirect_urls:
+    - https://kwielford.com
+  scopes:
+    bot:
+      - assistant:write
+      - chat:write
+      - channels:history
+      - groups:history
+      - im:history
+      - mpim:history
+settings:
+  event_subscriptions:
+    request_url: https://kwielford.com/api/slack/assistant/events
+    bot_events:
+      - assistant_thread_started
+      - assistant_thread_context_changed
+      - message.im
+  interactivity:
+    is_enabled: true
+    request_url: https://kwielford.com/api/slack/assistant/events
+  socket_mode_enabled: false
+  org_deploy_enabled: false

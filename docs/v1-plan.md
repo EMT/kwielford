@@ -9,6 +9,7 @@ Goal: establish a single planning source of truth in the repo.
 - Create `docs/` directory for project planning and architecture notes.
 - Create this document as the initial execution plan.
 - Keep key decisions here before they are codified.
+- Maintain cross-platform naming and scope details in `docs/project-context.md`.
 
 ## 1) Define v1 Scope (Initial Proposal)
 

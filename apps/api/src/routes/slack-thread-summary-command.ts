@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { createDb, getWorkspaceBySlackTeamId } from "@kwielford/db";
+import { createDb, getUserBySlackUserId, getWorkspaceBySlackTeamId } from "@kwielford/db";
 import {
   extractThreadReference,
   handleThreadSummaryCommand,
@@ -56,6 +56,19 @@ async function resolveWorkspaceId(input: {
   }
 
   return input.defaultWorkspaceId;
+}
+
+async function resolveInitiatedByUserId(input: {
+  workspaceId: string;
+  slackUserId?: string;
+}): Promise<string | undefined> {
+  if (!input.slackUserId) {
+    return undefined;
+  }
+
+  const db = createDb();
+  const user = await getUserBySlackUserId(db, input.workspaceId, input.slackUserId);
+  return user?.id;
 }
 
 function isAllowedCommand(command: string | undefined, allowedCommands: string[]): boolean {
@@ -131,6 +144,10 @@ export async function handleSlackThreadSummaryCommandRequest(request: Request): 
     const db = createDb();
     const workflow = new VercelWorkflowThreadSummaryDispatcher();
     const commandId = toCommandId(rawBody);
+    const initiatedByUserId = await resolveInitiatedByUserId({
+      workspaceId,
+      slackUserId: form.user_id
+    });
 
     const ack = await handleThreadSummaryCommand(
       {
@@ -142,7 +159,8 @@ export async function handleSlackThreadSummaryCommandRequest(request: Request): 
         channelId: resolved.channelId,
         threadTs: resolved.threadTs,
         commandId,
-        userId: form.user_id
+        initiatedByUserId,
+        actorId: form.user_id
       }
     );
 

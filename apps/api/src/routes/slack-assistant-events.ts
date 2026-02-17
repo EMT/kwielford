@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { createDb, getWorkspaceBySlackTeamId } from "@kwielford/db";
+import { createDb, getUserBySlackUserId, getWorkspaceBySlackTeamId } from "@kwielford/db";
 import {
   extractThreadReference,
   handleThreadSummaryCommand,
@@ -126,6 +126,19 @@ async function resolveWorkspaceId(input: {
   }
 
   return input.defaultWorkspaceId;
+}
+
+async function resolveInitiatedByUserId(input: {
+  workspaceId: string;
+  slackUserId?: string;
+}): Promise<string | undefined> {
+  if (!input.slackUserId) {
+    return undefined;
+  }
+
+  const db = createDb();
+  const user = await getUserBySlackUserId(db, input.workspaceId, input.slackUserId);
+  return user?.id;
 }
 
 function toCommandId(input: { eventId?: string; eventTs?: string; text?: string }): string {
@@ -310,6 +323,10 @@ async function handleAssistantMessageEvent(input: {
     eventTs: readString(input.event.event_ts) ?? readString(input.event.ts),
     text
   });
+  const initiatedByUserId = await resolveInitiatedByUserId({
+    workspaceId,
+    slackUserId: readString(input.event.user)
+  });
 
   const ack = await handleThreadSummaryCommand(
     {
@@ -321,7 +338,8 @@ async function handleAssistantMessageEvent(input: {
       channelId: targetChannelId,
       threadTs: targetThreadTs,
       commandId,
-      userId: readString(input.event.user)
+      initiatedByUserId,
+      actorId: readString(input.event.user)
     }
   );
 

@@ -17,7 +17,8 @@ export interface ThreadSummaryCommandPayload {
   channelId: string;
   threadTs: string;
   commandId: string;
-  userId?: string;
+  initiatedByUserId?: string;
+  actorId?: string;
 }
 
 export interface ThreadSummaryCommandAck {
@@ -30,7 +31,8 @@ export interface ThreadSummaryJobPayload {
   workspaceId: string;
   channelId: string;
   threadTs: string;
-  userId?: string;
+  initiatedByUserId?: string;
+  actorId?: string;
 }
 
 export interface ThreadSummaryMessageFetcher {
@@ -78,7 +80,7 @@ export async function handleThreadSummaryCommand(
 ): Promise<ThreadSummaryCommandAck> {
   const run = await createAgentRun(deps.db, {
     workspaceId: payload.workspaceId,
-    initiatedByUserId: payload.userId,
+    initiatedByUserId: payload.initiatedByUserId,
     triggerSource: "slack",
     taskKind: "thread_summary",
     idempotencyKey: `slack:${payload.commandId}`,
@@ -92,9 +94,9 @@ export async function handleThreadSummaryCommand(
   await createAuditEvent(deps.db, {
     workspaceId: payload.workspaceId,
     runId: run.id,
-    userId: payload.userId,
+    userId: payload.initiatedByUserId,
     actorType: "slack",
-    actorId: payload.userId,
+    actorId: payload.actorId,
     eventName: "thread_summary.command_received",
     eventData: {
       channelId: payload.channelId,
@@ -108,7 +110,8 @@ export async function handleThreadSummaryCommand(
     workspaceId: payload.workspaceId,
     channelId: payload.channelId,
     threadTs: payload.threadTs,
-    userId: payload.userId
+    initiatedByUserId: payload.initiatedByUserId,
+    actorId: payload.actorId
   });
 
   return {
@@ -150,7 +153,7 @@ export async function runThreadSummaryJob(
     await createMessage(deps.db, {
       workspaceId: payload.workspaceId,
       runId: payload.runId,
-      userId: payload.userId,
+      userId: payload.initiatedByUserId,
       source: "slack",
       role: "assistant",
       channelId: payload.channelId,
@@ -169,7 +172,7 @@ export async function runThreadSummaryJob(
     await createAuditEvent(deps.db, {
       workspaceId: payload.workspaceId,
       runId: payload.runId,
-      userId: payload.userId,
+      userId: payload.initiatedByUserId,
       actorType: "system",
       eventName: "thread_summary.completed",
       eventData: {
@@ -199,7 +202,7 @@ export async function runThreadSummaryJob(
     await createAuditEvent(deps.db, {
       workspaceId: payload.workspaceId,
       runId: payload.runId,
-      userId: payload.userId,
+      userId: payload.initiatedByUserId,
       actorType: "system",
       eventName: "thread_summary.failed",
       eventData: {

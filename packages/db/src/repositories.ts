@@ -5,6 +5,7 @@ import {
   agentRuns,
   auditEvents,
   messages,
+  users,
   workspaces,
   type AgentRun,
   type AgentRunStatus,
@@ -14,6 +15,7 @@ import {
   type NewAgentRun,
   type NewAuditEvent,
   type NewMessage,
+  type User,
   type Workspace
 } from "./schema.js";
 
@@ -168,5 +170,19 @@ export async function createAuditEvent(db: DbClient, input: CreateAuditEventInpu
 
 export async function getWorkspaceBySlackTeamId(db: DbClient, slackTeamId: string): Promise<Workspace | undefined> {
   const rows = await db.select().from(workspaces).where(eq(workspaces.slackTeamId, slackTeamId)).limit(1);
+  return rows[0];
+}
+
+export async function getUserBySlackUserId(
+  db: DbClient,
+  workspaceId: string,
+  slackUserId: string
+): Promise<User | undefined> {
+  const rows = await db
+    .select()
+    .from(users)
+    .where(and(eq(users.workspaceId, workspaceId), eq(users.slackUserId, slackUserId)))
+    .limit(1);
+
   return rows[0];
 }

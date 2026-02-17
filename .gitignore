@@ -7,3 +7,5 @@ dist
 apps/api/.next
 apps/api/.swc
 apps/api/app/.well-known/workflow/v1
+.vercel
+.env*.local

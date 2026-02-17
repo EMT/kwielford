@@ -8,6 +8,7 @@
     "clean": "find apps packages -name '*.tsbuildinfo' -delete && find apps packages -name dist -type d -prune -exec rm -rf {} + && rm -rf apps/api/.next apps/api/.swc apps/api/app/.well-known/workflow/v1"
   },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vercel": "^50.18.0"
   }
 }

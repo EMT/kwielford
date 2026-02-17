@@ -50,8 +50,8 @@ Notes:
 ### Slack channel adapter
 
 Inbound and protocol:
-- `apps/api/src/routes/slack-thread-summary-command.ts`
-- `apps/api/src/routes/slack-assistant-events.ts`
+- `apps/slack/src/inbound/thread-summary-command-handler.ts`
+- `apps/slack/src/inbound/assistant-events-handler.ts`
 - `apps/slack/src/parsers/slash-command.ts`
 - `apps/slack/src/security/verify-slack-signature.ts`
 
@@ -62,6 +62,8 @@ Outbound and channel UX:
 
 ### Delivery/runtime wiring
 
+- `apps/api/src/routes/slack-thread-summary-command.ts`
+- `apps/api/src/routes/slack-assistant-events.ts`
 - `apps/api/app/api/slack/thread-summary/route.ts`
 - `apps/api/app/api/slack/assistant/events/route.ts`
 - `apps/api/src/adapters/vercel-workflow-thread-summary-dispatcher.ts`
@@ -70,9 +72,9 @@ Outbound and channel UX:
 
 ## Boundary gaps to close
 
-1. API routes still include Slack-specific request parsing and direct workspace resolution logic.
-2. More task flows need to move into `@kwielford/app` as they are introduced.
-3. Permission and policy checks should become explicit app-layer contracts before adding new high-impact actions.
+1. More task flows need to move into `@kwielford/app` as they are introduced.
+2. Permission and policy checks should become explicit app-layer contracts before adding new high-impact actions.
+3. Workspace/user identity resolution for channels should be standardized behind app-layer interfaces.
 
 ## Recommended refactor sequence
 

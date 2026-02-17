@@ -9,6 +9,7 @@ This repo now supports Slack AI app events via:
 
 - `apps/api/app/api/slack/assistant/events/route.ts`
 - `apps/api/src/routes/slack-assistant-events.ts`
+- `apps/slack/src/inbound/assistant-events-handler.ts`
 
 ## Event flow
 

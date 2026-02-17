@@ -25,6 +25,7 @@ This vertical slice scaffolds the end-to-end flow:
 - Application orchestration:
   - `packages/app/src/thread-summary-flow.ts`
 - Slack API/signature adapters:
+  - `apps/slack/src/inbound/thread-summary-command-handler.ts`
   - `apps/slack/src/adapters/slack-web-api.ts`
   - `apps/slack/src/security/verify-slack-signature.ts`
   - `apps/slack/src/parsers/slash-command.ts`

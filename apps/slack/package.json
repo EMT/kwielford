@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@kwielford/app": "workspace:*",
-    "@kwielford/core": "workspace:*"
+    "@kwielford/core": "workspace:*",
+    "@kwielford/db": "workspace:*"
   }
 }

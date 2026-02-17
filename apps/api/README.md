@@ -7,15 +7,23 @@ Architecture reference:
 
 ## Thread summary slash command
 
-Primary handler:
+API route wrapper:
 
 - `src/routes/slack-thread-summary-command.ts`
 
+Slack inbound handler:
+
+- `apps/slack/src/inbound/thread-summary-command-handler.ts`
+
 ## Slack AI assistant events
 
-Primary handler:
+API route wrapper:
 
 - `src/routes/slack-assistant-events.ts`
+
+Slack inbound handler:
+
+- `apps/slack/src/inbound/assistant-events-handler.ts`
 
 Vercel-style wrapper (re-exported):
 

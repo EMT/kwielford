@@ -1,5 +1,5 @@
-import { getRuntimeConfig } from "@kweilford/config";
-import { getDbHealth } from "@kweilford/db";
+import { getRuntimeConfig } from "@kwielford/config";
+import { getDbHealth } from "@kwielford/db";
 export * from "./tasks/thread-summary.js";
 
 export interface CoreHealth {

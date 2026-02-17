@@ -1,12 +1,12 @@
 import { createHash } from "node:crypto";
 
-import { createDb, getWorkspaceBySlackTeamId } from "@kweilford/db";
+import { createDb, getWorkspaceBySlackTeamId } from "@kwielford/db";
 import {
   extractThreadReference,
   handleThreadSummaryCommand,
   parseSlashCommandFormBody,
   verifySlackSignature
-} from "@kweilford/slack";
+} from "@kwielford/slack";
 
 import { VercelWorkflowThreadSummaryDispatcher } from "../adapters/vercel-workflow-thread-summary-dispatcher.js";
 import { getApiConfig } from "../env.js";

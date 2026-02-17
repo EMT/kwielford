@@ -33,7 +33,7 @@ Status date: 2026-02-17
 
 Optional:
 
-- `SLACK_ALLOWED_COMMANDS` (default: `/kweilford-summary`)
+- `SLACK_ALLOWED_COMMANDS` (default: `/kwielford-summary`)
 - `DEFAULT_WORKSPACE_ID` (fallback workspace if team mapping is not in DB)
 
 ## Deploy route structure (Vercel + Next.js)
@@ -50,7 +50,7 @@ Deploy `apps/api` as a Vercel project. The slash command URL should be:
 
 ## Slack app setup
 
-1. Create a slash command, for example `/kweilford-summary`.
+1. Create a slash command, for example `/kwielford-summary`.
 2. Point the command request URL to your deployed command endpoint.
 3. Add bot scopes needed for this flow:
    - `channels:history` (or matching conversation history scope)
@@ -77,9 +77,9 @@ The slash command input must include either:
 ## Local signed request test
 
 1. Start API app:
-   - `pnpm --filter @kweilford/api dev`
+   - `pnpm --filter @kwielford/api dev`
 2. In another terminal, run:
-   - `SLACK_SIGNING_SECRET=<your-secret> pnpm --filter @kweilford/api test:slash-command`
+   - `SLACK_SIGNING_SECRET=<your-secret> pnpm --filter @kwielford/api test:slash-command`
 
 The helper script signs a form-encoded slash command payload and posts it to:
 
@@ -89,6 +89,6 @@ The helper script signs a form-encoded slash command payload and posts it to:
 
 Run these commands after setting env vars:
 
-1. `pnpm --filter @kweilford/db db:migrate`
-2. `SEED_WORKSPACE_NAME=Fieldwork SEED_WORKSPACE_SLUG=fieldwork SEED_SLACK_TEAM_ID=<T...> pnpm --filter @kweilford/db db:seed`
+1. `pnpm --filter @kwielford/db db:migrate`
+2. `SEED_WORKSPACE_NAME=Fieldwork SEED_WORKSPACE_SLUG=fieldwork SEED_SLACK_TEAM_ID=<T...> pnpm --filter @kwielford/db db:seed`
 3. Deploy `apps/api` to Vercel and set the same env vars in Vercel project settings.

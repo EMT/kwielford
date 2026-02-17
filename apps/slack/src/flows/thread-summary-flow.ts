@@ -3,14 +3,14 @@ import {
   summarizeThread,
   type ThreadMessage,
   type ThreadSummaryOutput
-} from "@kweilford/core";
+} from "@kwielford/core";
 import {
   createAgentRun,
   createAuditEvent,
   createMessage,
   updateAgentRunState,
   type DbClient
-} from "@kweilford/db";
+} from "@kwielford/db";
 
 export interface ThreadSummaryCommandPayload {
   workspaceId: string;

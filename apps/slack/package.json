@@ -1,5 +1,5 @@
 {
-  "name": "@kweilford/slack",
+  "name": "@kwielford/slack",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,7 +10,7 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
-    "@kweilford/core": "workspace:*",
-    "@kweilford/db": "workspace:*"
+    "@kwielford/core": "workspace:*",
+    "@kwielford/db": "workspace:*"
   }
 }

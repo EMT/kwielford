@@ -1,4 +1,4 @@
-import type { ThreadMessage } from "@kweilford/core";
+import type { ThreadMessage } from "@kwielford/core";
 
 import type {
   ThreadSummaryMessageFetcher,

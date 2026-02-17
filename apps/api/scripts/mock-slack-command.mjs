@@ -23,7 +23,7 @@ const form = new URLSearchParams({
   channel_name: process.env.TEST_CHANNEL_NAME ?? "general",
   user_id: process.env.TEST_USER_ID ?? "U123456",
   user_name: process.env.TEST_USER_NAME ?? "tester",
-  command: process.env.TEST_COMMAND ?? "/kweilford-summary",
+  command: process.env.TEST_COMMAND ?? "/kwielford-summary",
   text:
     process.env.TEST_TEXT ??
     "https://fieldwork.slack.com/archives/C123456/p1739999999000100?thread_ts=1739999999.000100&cid=C123456",

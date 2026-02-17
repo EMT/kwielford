@@ -1,4 +1,4 @@
-import { getCoreHealth } from "@kweilford/core";
+import { getCoreHealth } from "@kwielford/core";
 export * from "./cli.js";
 
 export function getCliHealth() {

@@ -1,4 +1,4 @@
-# Kweilford v1 Plan
+# Kwielford v1 Plan
 
 Status date: 2026-02-17
 
@@ -132,7 +132,7 @@ docs/
 
 ### CLI Reuse Notes (Implemented Scaffold)
 
-- Added `kweilford thread-summary` command in `apps/cli`.
+- Added `kwielford thread-summary` command in `apps/cli`.
 - Command reads thread message JSON, runs shared `packages/core` summarizer, and prints formatted output.
 - Optional persistence (`--workspace-id`) writes run/message/audit records via shared `packages/db` repository functions.
 

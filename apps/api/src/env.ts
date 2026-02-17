@@ -1,4 +1,4 @@
-import { getRuntimeConfig } from "@kweilford/config";
+import { getRuntimeConfig } from "@kwielford/config";
 
 export interface ApiConfig {
   appEnv: ReturnType<typeof getRuntimeConfig>["appEnv"];
@@ -25,7 +25,7 @@ function getOptionalEnv(name: string): string | undefined {
 }
 
 function parseAllowedCommands(raw: string | undefined): string[] {
-  const value = raw ?? "/kweilford-summary";
+  const value = raw ?? "/kwielford-summary";
   return value
     .split(",")
     .map((item) => item.trim())

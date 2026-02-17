@@ -14,16 +14,16 @@ importers:
 
   apps/api:
     dependencies:
-      '@kweilford/config':
+      '@kwielford/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@kweilford/core':
+      '@kwielford/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@kweilford/db':
+      '@kwielford/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@kweilford/slack':
+      '@kwielford/slack':
         specifier: workspace:*
         version: link:../slack
       next:
@@ -48,19 +48,19 @@ importers:
 
   apps/cli:
     dependencies:
-      '@kweilford/core':
+      '@kwielford/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@kweilford/db':
+      '@kwielford/db':
         specifier: workspace:*
         version: link:../../packages/db
 
   apps/slack:
     dependencies:
-      '@kweilford/core':
+      '@kwielford/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@kweilford/db':
+      '@kwielford/db':
         specifier: workspace:*
         version: link:../../packages/db
 
@@ -68,10 +68,10 @@ importers:
 
   packages/core:
     dependencies:
-      '@kweilford/config':
+      '@kwielford/config':
         specifier: workspace:*
         version: link:../config
-      '@kweilford/db':
+      '@kwielford/db':
         specifier: workspace:*
         version: link:../db
 

@@ -1,6 +1,6 @@
-# @kweilford/api
+# @kwielford/api
 
-API and workflow integration package for Kweilford.
+API and workflow integration package for Kwielford.
 
 ## Thread summary slash command
 
@@ -32,6 +32,6 @@ Dispatcher implementation:
 
 ## Scripts
 
-- `pnpm --filter @kweilford/api dev`
-- `pnpm --filter @kweilford/api build`
-- `pnpm --filter @kweilford/api test:slash-command`
+- `pnpm --filter @kwielford/api dev`
+- `pnpm --filter @kwielford/api build`
+- `pnpm --filter @kwielford/api test:slash-command`

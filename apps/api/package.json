@@ -1,5 +1,5 @@
 {
-  "name": "@kweilford/api",
+  "name": "@kwielford/api",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -13,10 +13,10 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
-    "@kweilford/config": "workspace:*",
-    "@kweilford/core": "workspace:*",
-    "@kweilford/db": "workspace:*",
-    "@kweilford/slack": "workspace:*",
+    "@kwielford/config": "workspace:*",
+    "@kwielford/core": "workspace:*",
+    "@kwielford/db": "workspace:*",
+    "@kwielford/slack": "workspace:*",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",

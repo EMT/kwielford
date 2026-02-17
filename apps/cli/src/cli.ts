@@ -2,8 +2,8 @@
 
 import { readFile } from "node:fs/promises";
 
-import { formatThreadSummaryForSlack, summarizeThread, type ThreadMessage } from "@kweilford/core";
-import { createAgentRun, createAuditEvent, createDb, createMessage, updateAgentRunState } from "@kweilford/db";
+import { formatThreadSummaryForSlack, summarizeThread, type ThreadMessage } from "@kwielford/core";
+import { createAgentRun, createAuditEvent, createDb, createMessage, updateAgentRunState } from "@kwielford/db";
 
 interface ParsedArgs {
   command?: string;
@@ -67,7 +67,7 @@ function parseArgs(argv: string[]): ParsedArgs {
 function getUsage(): string {
   return [
     "Usage:",
-    "  kweilford thread-summary --channel <channel_id> --thread <thread_ts> --messages-file <path>",
+    "  kwielford thread-summary --channel <channel_id> --thread <thread_ts> --messages-file <path>",
     "",
     "Optional persistence:",
     "  --workspace-id <uuid>  Persist run/message/audit records to Postgres via DATABASE_URL",

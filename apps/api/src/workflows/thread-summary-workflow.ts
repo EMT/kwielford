@@ -1,10 +1,10 @@
-import type { ThreadSummaryOutput } from "@kweilford/core";
-import { createDb } from "@kweilford/db";
+import type { ThreadSummaryOutput } from "@kwielford/core";
+import { createDb } from "@kwielford/db";
 import {
   runThreadSummaryJob,
   SlackWebApiAdapter,
   type ThreadSummaryJobPayload
-} from "@kweilford/slack";
+} from "@kwielford/slack";
 
 import { getApiConfig } from "../env.js";
 

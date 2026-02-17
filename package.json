@@ -1,11 +1,11 @@
 {
-  "name": "kweilford",
+  "name": "kwielford",
   "private": true,
   "version": "0.1.0",
   "packageManager": "pnpm@10.27.0",
   "scripts": {
     "typecheck": "tsc -b",
-    "clean": "find . -name '*.tsbuildinfo' -delete && find . -name dist -type d -prune -exec rm -rf {} +"
+    "clean": "find apps packages -name '*.tsbuildinfo' -delete && find apps packages -name dist -type d -prune -exec rm -rf {} + && rm -rf apps/api/.next apps/api/.swc apps/api/app/.well-known/workflow/v1"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

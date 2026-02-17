@@ -1,4 +1,4 @@
-import { getCoreHealth } from "@kweilford/core";
+import { getCoreHealth } from "@kwielford/core";
 export * from "./adapters/slack-web-api.js";
 export * from "./flows/thread-summary-flow.js";
 export * from "./parsers/slash-command.js";

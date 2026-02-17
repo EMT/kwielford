@@ -1,6 +1,6 @@
-# @kweilford/db
+# @kwielford/db
 
-Neon + Drizzle data layer for Kweilford.
+Neon + Drizzle data layer for Kwielford.
 
 ## Environment
 
@@ -8,9 +8,9 @@ Neon + Drizzle data layer for Kweilford.
 
 ## Commands
 
-- `pnpm --filter @kweilford/db db:generate`
-- `pnpm --filter @kweilford/db db:migrate`
-- `pnpm --filter @kweilford/db db:studio`
+- `pnpm --filter @kwielford/db db:generate`
+- `pnpm --filter @kwielford/db db:migrate`
+- `pnpm --filter @kwielford/db db:studio`
 
 ## Core tables
 

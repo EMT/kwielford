@@ -1,0 +1,19 @@
+{
+  "name": "@kweilford/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "kweilford": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "@kweilford/core": "workspace:*",
+    "@kweilford/db": "workspace:*"
+  }
+}

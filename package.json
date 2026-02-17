@@ -1,0 +1,13 @@
+{
+  "name": "kweilford",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.27.0",
+  "scripts": {
+    "typecheck": "tsc -b",
+    "clean": "find . -name '*.tsbuildinfo' -delete && find . -name dist -type d -prune -exec rm -rf {} +"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

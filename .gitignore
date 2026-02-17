@@ -1,0 +1,9 @@
+node_modules
+.pnpm-store
+.env
+.env.*
+dist
+*.tsbuildinfo
+apps/api/.next
+apps/api/.swc
+apps/api/app/.well-known/workflow/v1

@@ -1,0 +1,29 @@
+{
+  "name": "@kweilford/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b && next build --webpack",
+    "dev": "next dev",
+    "start": "next start",
+    "test:slash-command": "node scripts/mock-slack-command.mjs",
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "@kweilford/config": "workspace:*",
+    "@kweilford/core": "workspace:*",
+    "@kweilford/db": "workspace:*",
+    "@kweilford/slack": "workspace:*",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "workflow": "4.1.0-beta.57"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3"
+  }
+}

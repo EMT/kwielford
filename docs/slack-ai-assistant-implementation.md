@@ -16,13 +16,15 @@ This repo now supports Slack AI app events via:
    - store assistant-thread context (best effort, in-memory),
    - set assistant thread title,
    - set suggested prompts.
-5. `message.im`:
+5. `assistant_thread_started`:
+   - posts a kickoff message that starts an "improve Kwielford" planning conversation.
+6. `message.im`:
    - ignores bot messages,
-   - parses user text for thread permalink/timestamp,
-   - resolves workspace by Slack `team_id` (or `DEFAULT_WORKSPACE_ID`),
+   - if no permalink is present, responds with build/setup suggestions to improve assistant usefulness,
+   - if permalink is present, resolves workspace by Slack `team_id` (or `DEFAULT_WORKSPACE_ID`),
    - queues existing thread-summary workflow,
    - replies in assistant thread with run id.
-6. Workflow posts the final summary back into the source Slack thread.
+7. Workflow posts the final summary back into the source Slack thread.
 
 ## Minimal Bolt skeleton (optional alternative)
 
@@ -46,11 +48,16 @@ app.event("assistant_thread_started", async ({ event, client }) => {
     thread_ts: event.assistant_thread.thread_ts,
     prompts: [
       {
-        title: "Summarize a thread",
-        message:
-          "Summarize this thread https://fieldwork.slack.com/archives/C123456/p1739999999000100?thread_ts=1739999999.000100&cid=C123456"
+        title: "Improve Kwielford",
+        message: "Help us make you a better assistant. What should we build first?"
       }
     ]
+  });
+
+  await client.chat.postMessage({
+    channel: event.assistant_thread.channel_id,
+    thread_ts: event.assistant_thread.thread_ts,
+    text: "Let's make me a better assistant for your team. Ask for `roadmap`, `memory`, `integrations`, `workflows`, or `quality`."
   });
 });
 

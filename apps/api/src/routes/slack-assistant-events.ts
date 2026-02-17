@@ -33,6 +33,14 @@ const MAX_ASSISTANT_CONTEXT_ENTRIES = 500;
 
 const DEFAULT_PROMPTS: SlackAssistantPrompt[] = [
   {
+    title: "Improve Kwielford",
+    message: "Help us make you a better assistant. What should we build first?"
+  },
+  {
+    title: "Assistant roadmap",
+    message: "Suggest a 2-week roadmap to make you more useful for our team."
+  },
+  {
     title: "Summarize a thread",
     message:
       "Summarize this thread: https://fieldwork.slack.com/archives/C123456/p1739999999000100?thread_ts=1739999999.000100&cid=C123456"
@@ -40,10 +48,6 @@ const DEFAULT_PROMPTS: SlackAssistantPrompt[] = [
   {
     title: "How to use this",
     message: "How do I use this assistant?"
-  },
-  {
-    title: "Scope and output",
-    message: "What output format do you post?"
   }
 ];
 
@@ -177,10 +181,147 @@ function asTeamId(envelope: JsonObject, event: JsonObject, context?: AssistantTh
 
 function asHelpText(): string {
   return [
-    "I can queue a thread summary and post results in that thread.",
-    "Send a thread permalink, for example:",
-    "https://fieldwork.slack.com/archives/C123456/p1739999999000100?thread_ts=1739999999.000100&cid=C123456"
+    "I can help in two modes:",
+    "1) Improvement planning: ask how to make me a better assistant and I will suggest concrete builds/setups.",
+    "2) Thread summary: send a thread permalink and I will queue a summary workflow.",
+    "",
+    "Thread permalink example:",
+    "https://fieldwork.slack.com/archives/C123456/p1739999999000100?thread_ts=1739999999.000100&cid=C123456",
+    "",
+    "Try: `Help us make you better. What should we build first?`"
   ].join("\n");
+}
+
+function asKickoffText(): string {
+  return [
+    "Let's make me a better assistant for your team.",
+    "I can suggest specific things to build and set up so I can help more effectively.",
+    "",
+    "High-impact upgrades to start with:",
+    "1) Memory and context",
+    "   - Team goals, owners, project glossary, definition of done",
+    "2) Integrations",
+    "   - Linear/Jira, GitHub, docs/wiki, incident tooling",
+    "3) Workflows",
+    "   - Daily standup digest, blocker tracking, action-item follow-up",
+    "4) Quality controls",
+    "   - Required output format, confidence labels, human-approval gates",
+    "",
+    "Reply with `memory`, `integrations`, `workflows`, `quality`, or `roadmap` and I'll draft a concrete plan."
+  ].join("\n");
+}
+
+function asImprovementRoadmapText(): string {
+  return [
+    "Suggested first roadmap:",
+    "1) Context pack (1 day): team goals, project map, owners, key links.",
+    "2) Integration pass (2-3 days): connect ticketing + code + docs sources.",
+    "3) Workflow automations (2 days): standup digest, blockers, decision log.",
+    "4) Response contracts (1 day): output templates, severity levels, escalation rules.",
+    "5) Validation loop (ongoing): weekly feedback review and prompt/tool updates.",
+    "",
+    "If you want, I can turn this into a scoped backlog with owners and acceptance criteria."
+  ].join("\n");
+}
+
+function asTopicPlanText(topic: "memory" | "integrations" | "workflows" | "quality"): string {
+  if (topic === "memory") {
+    return [
+      "Memory setup plan:",
+      "1) Create a canonical project context doc (mission, owners, glossary, constraints).",
+      "2) Add a decision log with date, decision, rationale, and links.",
+      "3) Add per-team preferences (tone, format, escalation defaults).",
+      "4) Add a weekly refresh checklist so stale context is corrected.",
+      "",
+      "Build target: a machine-readable context bundle I can load before answering."
+    ].join("\n");
+  }
+
+  if (topic === "integrations") {
+    return [
+      "Integration setup plan:",
+      "1) Ticket source: sync open work, priorities, and due dates from Linear/Jira.",
+      "2) Code source: map PRs/commits to tickets and release notes from GitHub.",
+      "3) Knowledge source: index docs/runbooks and expose retrieval endpoints.",
+      "4) Incident source: ingest alerts/incidents to connect impact with team actions.",
+      "",
+      "Build target: one unified context feed that I can cite when suggesting actions."
+    ].join("\n");
+  }
+
+  if (topic === "workflows") {
+    return [
+      "Workflow setup plan:",
+      "1) Daily digest: blockers, decisions, ownership gaps, upcoming deadlines.",
+      "2) Action-item tracker: assign owners and due dates directly from thread summaries.",
+      "3) Follow-up reminders: ping unresolved items after agreed SLA.",
+      "4) Weekly retro brief: wins, misses, and process improvements.",
+      "",
+      "Build target: fewer dropped tasks and clearer operational visibility."
+    ].join("\n");
+  }
+
+  return [
+    "Quality-control setup plan:",
+    "1) Define required response formats by task type (summary, incident, planning).",
+    "2) Add confidence and evidence requirements to every high-impact answer.",
+    "3) Add approval gates for sensitive actions (external posts, escalations).",
+    "4) Track quality metrics: false positives, missed actions, correction latency.",
+    "",
+    "Build target: predictable, auditable assistant behavior with fewer regressions."
+  ].join("\n");
+}
+
+function toImprovementTopic(text: string): "memory" | "integrations" | "workflows" | "quality" | "roadmap" | undefined {
+  const lowerText = text.toLowerCase();
+
+  if (lowerText.includes("memory") || lowerText.includes("context")) {
+    return "memory";
+  }
+
+  if (
+    lowerText.includes("integration") ||
+    lowerText.includes("jira") ||
+    lowerText.includes("linear") ||
+    lowerText.includes("github") ||
+    lowerText.includes("notion")
+  ) {
+    return "integrations";
+  }
+
+  if (
+    lowerText.includes("workflow") ||
+    lowerText.includes("automation") ||
+    lowerText.includes("digest") ||
+    lowerText.includes("standup")
+  ) {
+    return "workflows";
+  }
+
+  if (
+    lowerText.includes("quality") ||
+    lowerText.includes("guardrail") ||
+    lowerText.includes("approval") ||
+    lowerText.includes("confidence")
+  ) {
+    return "quality";
+  }
+
+  if (
+    lowerText.includes("roadmap") ||
+    lowerText.includes("plan") ||
+    lowerText.includes("what should we build") ||
+    lowerText.includes("make you better")
+  ) {
+    return "roadmap";
+  }
+
+  return undefined;
+}
+
+function isLikelySummaryRequest(text: string): boolean {
+  const lowerText = text.toLowerCase();
+  return lowerText.includes("summarize") || lowerText.includes("summary") || lowerText.includes("thread");
 }
 
 async function safeSetAssistantUX(
@@ -245,6 +386,30 @@ async function handleAssistantThreadStartedEvent(input: {
     setTitle: "Kwielford assistant",
     prompts: DEFAULT_PROMPTS
   });
+
+  await input.slackApi.postThreadReply({
+    channelId: ref.channelId,
+    threadTs: ref.threadTs,
+    text: asKickoffText()
+  });
+}
+
+async function handleAssistantThreadContextChangedEvent(input: {
+  event: JsonObject;
+  slackApi: SlackWebApiAdapter;
+}): Promise<void> {
+  const ref = getAssistantThreadRef(input.event);
+  if (!ref) {
+    return;
+  }
+
+  const context = getAssistantContext(input.event);
+  rememberAssistantContext(ref, context);
+
+  await safeSetAssistantUX(input.slackApi, ref, {
+    setTitle: "Kwielford assistant",
+    prompts: DEFAULT_PROMPTS
+  });
 }
 
 async function handleAssistantMessageEvent(input: {
@@ -288,11 +453,42 @@ async function handleAssistantMessageEvent(input: {
   const targetThreadTs = extracted.threadTs;
 
   if (!targetThreadTs || !targetChannelId) {
+    const topic = toImprovementTopic(text);
+
+    if (topic === "roadmap") {
+      await input.slackApi.postThreadReply({
+        channelId: assistantRef.channelId,
+        threadTs: assistantRef.threadTs,
+        text: asImprovementRoadmapText()
+      });
+      return;
+    }
+
+    if (topic) {
+      await input.slackApi.postThreadReply({
+        channelId: assistantRef.channelId,
+        threadTs: assistantRef.threadTs,
+        text: asTopicPlanText(topic)
+      });
+      return;
+    }
+
+    if (isLikelySummaryRequest(text)) {
+      await input.slackApi.postThreadReply({
+        channelId: assistantRef.channelId,
+        threadTs: assistantRef.threadTs,
+        text:
+          "Please include a Slack thread permalink so I can summarize the exact thread. Send `help` for an example."
+      });
+      return;
+    }
+
     await input.slackApi.postThreadReply({
       channelId: assistantRef.channelId,
       threadTs: assistantRef.threadTs,
-      text:
-        "Please include a Slack thread permalink so I can summarize the exact thread. Send `help` for an example."
+      text: [asImprovementRoadmapText(), "", "If you prefer, paste a thread permalink and I can summarize it."].join(
+        "\n"
+      )
     });
     return;
   }
@@ -403,8 +599,16 @@ export async function handleSlackAssistantEventsRequest(request: Request): Promi
   });
   const eventType = readString(event.type);
 
-  if (eventType === "assistant_thread_started" || eventType === "assistant_thread_context_changed") {
+  if (eventType === "assistant_thread_started") {
     await handleAssistantThreadStartedEvent({
+      event,
+      slackApi
+    });
+    return okResponse();
+  }
+
+  if (eventType === "assistant_thread_context_changed") {
+    await handleAssistantThreadContextChangedEvent({
       event,
       slackApi
     });

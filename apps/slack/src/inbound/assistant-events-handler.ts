@@ -86,6 +86,20 @@ function readString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
 
+function describeError(error: unknown): { name?: string; message: string; stack?: string } {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    };
+  }
+
+  return {
+    message: typeof error === "string" ? error : JSON.stringify(error)
+  };
+}
+
 function cleanupSeenEventIds(now: number): void {
   for (const [eventId, state] of seenEventIds.entries()) {
     if (state.expiresAt <= now) {
@@ -508,12 +522,14 @@ async function handleAssistantMessageEvent(input: {
   }
 
   if (input.replyGenerator) {
+    let phase: "fetch_thread" | "generate_reply" | "post_reply" = "fetch_thread";
     try {
       const threadMessages = await input.slackApi.fetchThreadMessages({
         channelId: assistantRef.channelId,
         threadTs: assistantRef.threadTs
       });
 
+      phase = "generate_reply";
       const llmReply = await input.replyGenerator.generateReply({
         text,
         sourceChannelId: context?.sourceChannelId,
@@ -521,13 +537,24 @@ async function handleAssistantMessageEvent(input: {
         threadMessages
       });
 
+      phase = "post_reply";
       await input.slackApi.postThreadReply({
         channelId: assistantRef.channelId,
         threadTs: assistantRef.threadTs,
         text: llmReply
       });
       return;
-    } catch {
+    } catch (error) {
+      console.error("[assistant-events] LLM reply path failed", {
+        phase,
+        channelId: assistantRef.channelId,
+        threadTs: assistantRef.threadTs,
+        sourceChannelId: context?.sourceChannelId,
+        teamId: context?.teamId,
+        inputTextLength: text.length,
+        error: describeError(error)
+      });
+
       await input.slackApi.postThreadReply({
         channelId: assistantRef.channelId,
         threadTs: assistantRef.threadTs,

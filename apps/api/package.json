@@ -18,7 +18,8 @@
     "@kwielford/slack": "workspace:*",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "workflow": "4.1.0-beta.57"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",

@@ -21,10 +21,39 @@ type JsonObject = Record<string, unknown>;
 export interface SlackAssistantEventsInboundDeps {
   slackApi: SlackWebApiAdapter;
   signingSecret: string;
+  replyGenerator?: AssistantReplyGenerator;
+  enqueueAssistantEventJob?: (job: SlackAssistantEventJobPayload) => Promise<void>;
+}
+
+export interface AssistantReplyInput {
+  text: string;
+  sourceChannelId?: string;
+  teamId?: string;
+  threadMessages: Array<{
+    ts: string;
+    userId?: string;
+    text: string;
+  }>;
+}
+
+export interface AssistantReplyGenerator {
+  generateReply(input: AssistantReplyInput): Promise<string>;
+}
+
+export interface SlackAssistantEventJobPayload {
+  event: Record<string, unknown>;
+  eventId?: string;
+}
+
+export interface SlackAssistantEventJobDeps {
+  slackApi: SlackWebApiAdapter;
+  replyGenerator?: AssistantReplyGenerator;
 }
 
 const assistantContextByThread = new Map<string, AssistantThreadContext>();
 const MAX_ASSISTANT_CONTEXT_ENTRIES = 500;
+const seenEventIds = new Map<string, { expiresAt: number; status: "processing" | "done" }>();
+const EVENT_ID_TTL_MS = 10 * 60 * 1000;
 
 const DEFAULT_PROMPTS: SlackAssistantPrompt[] = [
   {
@@ -55,6 +84,40 @@ function readObject(value: unknown): JsonObject | undefined {
 
 function readString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
+}
+
+function cleanupSeenEventIds(now: number): void {
+  for (const [eventId, state] of seenEventIds.entries()) {
+    if (state.expiresAt <= now) {
+      seenEventIds.delete(eventId);
+    }
+  }
+}
+
+function tryStartEvent(eventId: string): boolean {
+  const now = Date.now();
+  cleanupSeenEventIds(now);
+
+  if (seenEventIds.has(eventId)) {
+    return false;
+  }
+
+  seenEventIds.set(eventId, {
+    expiresAt: now + EVENT_ID_TTL_MS,
+    status: "processing"
+  });
+  return true;
+}
+
+function markEventDone(eventId: string): void {
+  seenEventIds.set(eventId, {
+    expiresAt: Date.now() + EVENT_ID_TTL_MS,
+    status: "done"
+  });
+}
+
+function markEventFailed(eventId: string): void {
+  seenEventIds.delete(eventId);
 }
 
 function threadKey(ref: AssistantThreadRef): string {
@@ -365,6 +428,7 @@ async function handleAssistantThreadContextChangedEvent(input: {
 async function handleAssistantMessageEvent(input: {
   event: JsonObject;
   slackApi: SlackWebApiAdapter;
+  replyGenerator?: AssistantReplyGenerator;
 }): Promise<void> {
   if (!isAssistantMessageEvent(input.event) || isBotMessage(input.event)) {
     return;
@@ -426,11 +490,78 @@ async function handleAssistantMessageEvent(input: {
     return;
   }
 
+  if (input.replyGenerator) {
+    try {
+      const threadMessages = await input.slackApi.fetchThreadMessages({
+        channelId: assistantRef.channelId,
+        threadTs: assistantRef.threadTs
+      });
+
+      const llmReply = await input.replyGenerator.generateReply({
+        text,
+        sourceChannelId: context?.sourceChannelId,
+        teamId: context?.teamId,
+        threadMessages
+      });
+
+      await input.slackApi.postThreadReply({
+        channelId: assistantRef.channelId,
+        threadTs: assistantRef.threadTs,
+        text: llmReply
+      });
+      return;
+    } catch {
+      await input.slackApi.postThreadReply({
+        channelId: assistantRef.channelId,
+        threadTs: assistantRef.threadTs,
+        text:
+          "I hit an LLM error while drafting a response. Please try again, or ask for `roadmap` or `access` for deterministic guidance."
+      });
+      return;
+    }
+  }
+
   await input.slackApi.postThreadReply({
     channelId: assistantRef.channelId,
     threadTs: assistantRef.threadTs,
     text: [asImprovementRoadmapText(), "", asAccessPlanText(context)].join("\n")
   });
+}
+
+export async function handleSlackAssistantEventJob(
+  deps: SlackAssistantEventJobDeps,
+  job: SlackAssistantEventJobPayload
+): Promise<void> {
+  const event = readObject(job.event);
+  if (!event) {
+    return;
+  }
+
+  const eventType = readString(event.type);
+
+  if (eventType === "assistant_thread_started") {
+    await handleAssistantThreadStartedEvent({
+      event,
+      slackApi: deps.slackApi
+    });
+    return;
+  }
+
+  if (eventType === "assistant_thread_context_changed") {
+    await handleAssistantThreadContextChangedEvent({
+      event,
+      slackApi: deps.slackApi
+    });
+    return;
+  }
+
+  if (isAssistantMessageEvent(event)) {
+    await handleAssistantMessageEvent({
+      event,
+      slackApi: deps.slackApi,
+      replyGenerator: deps.replyGenerator
+    });
+  }
 }
 
 export async function handleSlackAssistantEventsInboundRequest(
@@ -483,29 +614,51 @@ export async function handleSlackAssistantEventsInboundRequest(
     return okResponse();
   }
 
-  const eventType = readString(event.type);
-
-  if (eventType === "assistant_thread_started") {
-    await handleAssistantThreadStartedEvent({
-      event,
-      slackApi: deps.slackApi
-    });
+  const eventId = readString(envelope.event_id);
+  if (eventId && !tryStartEvent(eventId)) {
     return okResponse();
   }
 
-  if (eventType === "assistant_thread_context_changed") {
-    await handleAssistantThreadContextChangedEvent({
-      event,
-      slackApi: deps.slackApi
-    });
+  if (deps.enqueueAssistantEventJob) {
+    try {
+      await deps.enqueueAssistantEventJob({
+        event,
+        eventId
+      });
+
+      if (eventId) {
+        markEventDone(eventId);
+      }
+    } catch {
+      if (eventId) {
+        markEventFailed(eventId);
+      }
+
+      return new Response("Failed to queue assistant event", { status: 500 });
+    }
+
     return okResponse();
   }
 
-  if (isAssistantMessageEvent(event)) {
-    await handleAssistantMessageEvent({
-      event,
-      slackApi: deps.slackApi
-    });
+  try {
+    await handleSlackAssistantEventJob(
+      {
+        slackApi: deps.slackApi,
+        replyGenerator: deps.replyGenerator
+      },
+      {
+        event,
+        eventId
+      }
+    );
+
+    if (eventId) {
+      markEventDone(eventId);
+    }
+  } catch {
+    if (eventId) {
+      markEventFailed(eventId);
+    }
   }
 
   return okResponse();

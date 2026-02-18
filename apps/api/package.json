@@ -13,9 +13,11 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.29",
     "@kwielford/config": "workspace:*",
     "@kwielford/core": "workspace:*",
     "@kwielford/slack": "workspace:*",
+    "ai": "^6.0.90",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",

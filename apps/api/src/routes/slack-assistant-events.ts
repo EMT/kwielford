@@ -8,7 +8,7 @@ import {
   type AssistantEventJobDispatcher,
   VercelWorkflowAssistantEventDispatcher
 } from "../adapters/vercel-workflow-assistant-event-dispatcher.js";
-import { createOpenAiAssistantReplyGenerator } from "../adapters/llm-chat.js";
+import { createAiGatewayAssistantReplyGenerator } from "../adapters/llm-chat.js";
 import { getApiConfig } from "../env.js";
 
 export interface SlackAssistantEventsRequestOptions {
@@ -22,7 +22,7 @@ export async function handleSlackAssistantEventsRequest(
   const config = getApiConfig();
   const dispatcher = options.eventDispatcher ?? new VercelWorkflowAssistantEventDispatcher();
   const replyGenerator = config.llmApiKey
-    ? createOpenAiAssistantReplyGenerator({
+    ? createAiGatewayAssistantReplyGenerator({
         apiKey: config.llmApiKey,
         model: config.llmModel,
         baseUrl: config.llmBaseUrl,

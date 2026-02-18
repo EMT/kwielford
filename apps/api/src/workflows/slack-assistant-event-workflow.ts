@@ -4,7 +4,7 @@ import {
   type SlackAssistantEventJobPayload
 } from "@kwielford/slack";
 
-import { createOpenAiAssistantReplyGenerator } from "../adapters/llm-chat.js";
+import { createAiGatewayAssistantReplyGenerator } from "../adapters/llm-chat.js";
 import { getApiConfig } from "../env.js";
 
 async function executeSlackAssistantEventJob(payload: SlackAssistantEventJobPayload): Promise<void> {
@@ -15,7 +15,7 @@ async function executeSlackAssistantEventJob(payload: SlackAssistantEventJobPayl
     botToken: config.slackBotToken
   });
   const replyGenerator = config.llmApiKey
-    ? createOpenAiAssistantReplyGenerator({
+    ? createAiGatewayAssistantReplyGenerator({
         apiKey: config.llmApiKey,
         model: config.llmModel,
         baseUrl: config.llmBaseUrl,

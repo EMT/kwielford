@@ -1,3 +1,5 @@
+import { createGateway, generateText } from "ai";
+
 import type { AssistantReplyGenerator, AssistantReplyInput } from "@kwielford/slack";
 
 export interface LlmChatConfig {
@@ -8,37 +10,12 @@ export interface LlmChatConfig {
   temperature: number;
 }
 
-interface OpenAiChatCompletionChoice {
-  message?: {
-    content?: string | Array<{ type?: string; text?: string }>;
-  };
-}
-
-interface OpenAiChatCompletionResponse {
-  choices?: OpenAiChatCompletionChoice[];
-}
-
 function normalizeText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
 }
 
 function truncate(value: string, limit: number): string {
   return value.length <= limit ? value : `${value.slice(0, limit - 1)}…`;
-}
-
-function asOpenAiContent(value: unknown): string {
-  if (typeof value === "string") {
-    return normalizeText(value);
-  }
-
-  if (Array.isArray(value)) {
-    const text = value
-      .map((item) => (item && typeof item === "object" && typeof item.text === "string" ? item.text : ""))
-      .join(" ");
-    return normalizeText(text);
-  }
-
-  return "";
 }
 
 function buildSystemPrompt(): string {
@@ -79,61 +56,34 @@ function buildHistoryContext(input: AssistantReplyInput): string {
   return contextLines.join("\n");
 }
 
-function buildMessages(input: AssistantReplyInput): Array<{ role: "system" | "user"; content: string }> {
-  return [
-    {
-      role: "system",
-      content: buildSystemPrompt()
-    },
-    {
-      role: "system",
-      content: buildHistoryContext(input)
-    },
-    {
-      role: "user",
-      content: truncate(input.text.trim(), 2_000)
-    }
-  ];
-}
+export function createAiGatewayAssistantReplyGenerator(config: LlmChatConfig): AssistantReplyGenerator {
+  const gateway = createGateway({
+    apiKey: config.apiKey,
+    baseURL: config.baseUrl
+  });
 
-export function createOpenAiAssistantReplyGenerator(config: LlmChatConfig): AssistantReplyGenerator {
   return {
     async generateReply(input: AssistantReplyInput): Promise<string> {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), config.timeoutMs);
-
-      try {
-        const response = await fetch(`${config.baseUrl.replace(/\/$/, "")}/chat/completions`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${config.apiKey}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: config.model,
-            temperature: config.temperature,
-            messages: buildMessages(input)
-          }),
-          signal: controller.signal
-        });
-
-        if (!response.ok) {
-          const errorBody = await response.text();
-          throw new Error(`LLM request failed (${response.status}): ${truncate(normalizeText(errorBody), 300)}`);
+      const { text } = await generateText({
+        model: gateway(config.model),
+        system: buildSystemPrompt(),
+        prompt: [buildHistoryContext(input), "", truncate(input.text.trim(), 2_000)].join("\n"),
+        temperature: config.temperature,
+        timeout: config.timeoutMs,
+        providerOptions: {
+          gateway: {
+            tags: ["kwielford", "slack-assistant"],
+            ...(input.teamId ? { user: input.teamId } : {})
+          }
         }
+      });
 
-        const payload = (await response.json()) as OpenAiChatCompletionResponse;
-        const firstChoice = payload.choices?.[0];
-        const content = asOpenAiContent(firstChoice?.message?.content);
-
-        if (!content) {
-          throw new Error("LLM response did not include message content.");
-        }
-
-        return truncate(content, 4_000);
-      } finally {
-        clearTimeout(timer);
+      const content = normalizeText(text);
+      if (!content) {
+        throw new Error("LLM response did not include message content.");
       }
+
+      return truncate(content, 4_000);
     }
   };
 }

@@ -25,11 +25,11 @@ Workflow entrypoint:
 - `DATABASE_URL`
 - `SLACK_SIGNING_SECRET`
 - `SLACK_BOT_TOKEN`
-- `LLM_API_KEY` (optional; enables AI-generated free-form chat replies)
-- `LLM_MODEL` (optional; default `gpt-4.1-mini`)
-- `LLM_BASE_URL` (optional; default `https://api.openai.com/v1`)
-- `LLM_TIMEOUT_MS` (optional; default `20000`)
-- `LLM_TEMPERATURE` (optional; default `0.2`)
+- `AI_GATEWAY_API_KEY` (optional; enables AI-generated free-form chat replies)
+- `AI_GATEWAY_MODEL` (optional; default `openai/gpt-4.1-mini`)
+- `AI_GATEWAY_BASE_URL` (optional; default `https://ai-gateway.vercel.sh/v1/ai`)
+- `AI_GATEWAY_TIMEOUT_MS` (optional; default `20000`)
+- `AI_GATEWAY_TEMPERATURE` (optional; default `0.2`)
 
 ## Scripts
 

@@ -21,11 +21,11 @@ Configure Slack so Kwielford can:
 
 ## Optional LLM Environment Variables
 
-- `LLM_API_KEY` (required for AI-generated free-form chat responses)
-- `LLM_MODEL` (default: `gpt-4.1-mini`)
-- `LLM_BASE_URL` (default: `https://api.openai.com/v1`)
-- `LLM_TIMEOUT_MS` (default: `20000`)
-- `LLM_TEMPERATURE` (default: `0.2`)
+- `AI_GATEWAY_API_KEY` (required for AI-generated free-form chat responses)
+- `AI_GATEWAY_MODEL` (default: `openai/gpt-4.1-mini`)
+- `AI_GATEWAY_BASE_URL` (default: `https://ai-gateway.vercel.sh/v1/ai`)
+- `AI_GATEWAY_TIMEOUT_MS` (default: `20000`)
+- `AI_GATEWAY_TEMPERATURE` (default: `0.2`)
 
 ## Slack App Configuration
 

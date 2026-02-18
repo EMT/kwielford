@@ -55,15 +55,20 @@ function parseTemperature(raw: string | undefined, defaultValue: number): number
 
 export function getApiConfig(): ApiConfig {
   const runtime = getRuntimeConfig();
+  const llmApiKey = getOptionalEnv("AI_GATEWAY_API_KEY");
+  const llmModel = getOptionalEnv("AI_GATEWAY_MODEL") ?? "openai/gpt-4.1-mini";
+  const llmBaseUrl = getOptionalEnv("AI_GATEWAY_BASE_URL") ?? "https://ai-gateway.vercel.sh/v1/ai";
+  const llmTimeoutMs = parsePositiveInt(getOptionalEnv("AI_GATEWAY_TIMEOUT_MS"), 20_000);
+  const llmTemperature = parseTemperature(getOptionalEnv("AI_GATEWAY_TEMPERATURE"), 0.2);
 
   return {
     appEnv: runtime.appEnv,
     slackSigningSecret: getRequiredEnv("SLACK_SIGNING_SECRET"),
     slackBotToken: getRequiredEnv("SLACK_BOT_TOKEN"),
-    llmApiKey: getOptionalEnv("LLM_API_KEY"),
-    llmModel: getOptionalEnv("LLM_MODEL") ?? "gpt-4.1-mini",
-    llmBaseUrl: getOptionalEnv("LLM_BASE_URL") ?? "https://api.openai.com/v1",
-    llmTimeoutMs: parsePositiveInt(getOptionalEnv("LLM_TIMEOUT_MS"), 20_000),
-    llmTemperature: parseTemperature(getOptionalEnv("LLM_TEMPERATURE"), 0.2)
+    llmApiKey,
+    llmModel,
+    llmBaseUrl,
+    llmTimeoutMs,
+    llmTemperature
   };
 }

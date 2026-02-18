@@ -34,6 +34,7 @@ Configure Slack so Kwielford can:
 - `assistant_thread_started`
 - `assistant_thread_context_changed`
 - `message.im`
+- `message.mpim`
 3. Set interactivity request URL to the same assistant events endpoint.
 4. Keep event processing asynchronous with Vercel Workflows: the API route ACKs quickly and event jobs run in workflow workers.
 

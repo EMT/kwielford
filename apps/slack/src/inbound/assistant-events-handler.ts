@@ -180,7 +180,12 @@ function getAssistantContext(event: JsonObject): AssistantThreadContext {
 }
 
 function isAssistantMessageEvent(event: JsonObject): boolean {
-  return readString(event.type) === "message" && readString(event.channel_type) === "im";
+  if (readString(event.type) !== "message") {
+    return false;
+  }
+
+  const channelType = readString(event.channel_type);
+  return channelType === "im" || channelType === "mpim";
 }
 
 function isBotMessage(event: JsonObject): boolean {

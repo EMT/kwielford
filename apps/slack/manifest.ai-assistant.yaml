@@ -38,6 +38,7 @@ settings:
       - assistant_thread_started
       - assistant_thread_context_changed
       - message.im
+      - message.mpim
   interactivity:
     is_enabled: true
     request_url: https://kwielford.com/api/slack/assistant/events

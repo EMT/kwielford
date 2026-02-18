@@ -12,7 +12,7 @@ Run Kwielford as a Slack AI assistant focused on:
 1. Verifies Slack signatures for all inbound events.
 2. ACKs event callbacks immediately, then enqueues background processing with Vercel Workflows.
 3. Deduplicates retries by Slack `event_id` before enqueue to reduce duplicate responses.
-4. Handles `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im`.
+4. Handles `assistant_thread_started`, `assistant_thread_context_changed`, `message.im`, and `message.mpim`.
 5. Uses AI SDK + Vercel AI Gateway for free-form chat turns when `AI_GATEWAY_API_KEY` is configured.
 6. Falls back to deterministic guidance if LLM is not configured or returns an error.
 7. Sets assistant thread title and suggested prompts.

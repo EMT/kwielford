@@ -43,6 +43,7 @@ export interface AssistantReplyGenerator {
 export interface SlackAssistantEventJobPayload {
   event: Record<string, unknown>;
   eventId?: string;
+  envelopeTeamId?: string;
 }
 
 export interface SlackAssistantEventJobDeps {
@@ -169,13 +170,26 @@ function getAssistantThreadRef(event: JsonObject): AssistantThreadRef | undefine
   };
 }
 
-function getAssistantContext(event: JsonObject): AssistantThreadContext {
+function getAssistantContext(
+  event: JsonObject,
+  fallback?: {
+    sourceChannelId?: string;
+    teamId?: string;
+  }
+): AssistantThreadContext {
   const assistantThread = readObject(event.assistant_thread);
   const context = readObject(assistantThread?.context);
 
+  const sourceChannelId =
+    readString(context?.channel_id) ??
+    readString(event.channel) ??
+    readString(assistantThread?.channel_id) ??
+    fallback?.sourceChannelId;
+  const teamId = readString(context?.team_id) ?? readString(event.team) ?? readString(event.team_id) ?? fallback?.teamId;
+
   return {
-    sourceChannelId: readString(context?.channel_id),
-    teamId: readString(context?.team_id)
+    sourceChannelId,
+    teamId
   };
 }
 
@@ -422,13 +436,17 @@ async function safeSetAssistantUX(
 async function handleAssistantThreadStartedEvent(input: {
   event: JsonObject;
   slackApi: SlackWebApiAdapter;
+  envelopeTeamId?: string;
 }): Promise<void> {
   const ref = getAssistantThreadRef(input.event);
   if (!ref) {
     return;
   }
 
-  const context = getAssistantContext(input.event);
+  const context = getAssistantContext(input.event, {
+    sourceChannelId: ref.channelId,
+    teamId: input.envelopeTeamId
+  });
   rememberAssistantContext(ref, context);
 
   await safeSetAssistantUX(input.slackApi, ref, {
@@ -446,13 +464,17 @@ async function handleAssistantThreadStartedEvent(input: {
 async function handleAssistantThreadContextChangedEvent(input: {
   event: JsonObject;
   slackApi: SlackWebApiAdapter;
+  envelopeTeamId?: string;
 }): Promise<void> {
   const ref = getAssistantThreadRef(input.event);
   if (!ref) {
     return;
   }
 
-  const context = getAssistantContext(input.event);
+  const context = getAssistantContext(input.event, {
+    sourceChannelId: ref.channelId,
+    teamId: input.envelopeTeamId
+  });
   rememberAssistantContext(ref, context);
 
   await safeSetAssistantUX(input.slackApi, ref, {
@@ -465,6 +487,7 @@ async function handleAssistantMessageEvent(input: {
   event: JsonObject;
   slackApi: SlackWebApiAdapter;
   replyGenerator?: AssistantReplyGenerator;
+  envelopeTeamId?: string;
 }): Promise<void> {
   if (!isAssistantMessageEvent(input.event) || isBotMessage(input.event)) {
     return;
@@ -475,7 +498,16 @@ async function handleAssistantMessageEvent(input: {
     return;
   }
 
-  const context = assistantContextByThread.get(threadKey(assistantRef));
+  const cachedContext = assistantContextByThread.get(threadKey(assistantRef));
+  const liveContext = getAssistantContext(input.event, {
+    sourceChannelId: assistantRef.channelId,
+    teamId: input.envelopeTeamId
+  });
+  const context: AssistantThreadContext = {
+    sourceChannelId: liveContext.sourceChannelId ?? cachedContext?.sourceChannelId,
+    teamId: liveContext.teamId ?? cachedContext?.teamId
+  };
+  rememberAssistantContext(assistantRef, context);
   const text = readString(input.event.text)?.trim() ?? "";
 
   if (!text) {
@@ -638,7 +670,8 @@ export async function handleSlackAssistantEventJob(
   if (eventType === "assistant_thread_started") {
     await handleAssistantThreadStartedEvent({
       event,
-      slackApi: deps.slackApi
+      slackApi: deps.slackApi,
+      envelopeTeamId: job.envelopeTeamId
     });
     return;
   }
@@ -646,7 +679,8 @@ export async function handleSlackAssistantEventJob(
   if (eventType === "assistant_thread_context_changed") {
     await handleAssistantThreadContextChangedEvent({
       event,
-      slackApi: deps.slackApi
+      slackApi: deps.slackApi,
+      envelopeTeamId: job.envelopeTeamId
     });
     return;
   }
@@ -655,7 +689,8 @@ export async function handleSlackAssistantEventJob(
     await handleAssistantMessageEvent({
       event,
       slackApi: deps.slackApi,
-      replyGenerator: deps.replyGenerator
+      replyGenerator: deps.replyGenerator,
+      envelopeTeamId: job.envelopeTeamId
     });
   }
 }
@@ -709,6 +744,7 @@ export async function handleSlackAssistantEventsInboundRequest(
   if (!event) {
     return okResponse();
   }
+  const envelopeTeamId = readString(envelope.team_id);
 
   const eventId = readString(envelope.event_id);
   if (eventId && !tryStartEvent(eventId)) {
@@ -719,7 +755,8 @@ export async function handleSlackAssistantEventsInboundRequest(
     try {
       await deps.enqueueAssistantEventJob({
         event,
-        eventId
+        eventId,
+        envelopeTeamId
       });
 
       if (eventId) {
@@ -744,7 +781,8 @@ export async function handleSlackAssistantEventsInboundRequest(
       },
       {
         event,
-        eventId
+        eventId,
+        envelopeTeamId
       }
     );
 

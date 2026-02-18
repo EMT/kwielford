@@ -350,6 +350,23 @@ function toImprovementTopic(
   return undefined;
 }
 
+function toExplicitTopicCommand(
+  text: string
+): "memory" | "integrations" | "workflows" | "quality" | "roadmap" | "access" | undefined {
+  const normalized = text.trim().toLowerCase();
+  const command = normalized.startsWith("/") ? normalized.slice(1) : normalized;
+
+  if (command === "roadmap" || command === "access") {
+    return command;
+  }
+
+  if (command === "memory" || command === "integrations" || command === "workflows" || command === "quality") {
+    return command;
+  }
+
+  return undefined;
+}
+
 async function safeSetAssistantUX(
   slackApi: SlackWebApiAdapter,
   ref: AssistantThreadRef,
@@ -461,9 +478,9 @@ async function handleAssistantMessageEvent(input: {
     return;
   }
 
-  const topic = toImprovementTopic(text);
+  const explicitTopic = toExplicitTopicCommand(text);
 
-  if (topic === "roadmap") {
+  if (explicitTopic === "roadmap") {
     await input.slackApi.postThreadReply({
       channelId: assistantRef.channelId,
       threadTs: assistantRef.threadTs,
@@ -472,7 +489,7 @@ async function handleAssistantMessageEvent(input: {
     return;
   }
 
-  if (topic === "access") {
+  if (explicitTopic === "access") {
     await input.slackApi.postThreadReply({
       channelId: assistantRef.channelId,
       threadTs: assistantRef.threadTs,
@@ -481,11 +498,11 @@ async function handleAssistantMessageEvent(input: {
     return;
   }
 
-  if (topic) {
+  if (explicitTopic) {
     await input.slackApi.postThreadReply({
       channelId: assistantRef.channelId,
       threadTs: assistantRef.threadTs,
-      text: asTopicPlanText(topic)
+      text: asTopicPlanText(explicitTopic)
     });
     return;
   }
@@ -521,10 +538,43 @@ async function handleAssistantMessageEvent(input: {
     }
   }
 
+  const inferredTopic = toImprovementTopic(text);
+
+  if (inferredTopic === "roadmap") {
+    await input.slackApi.postThreadReply({
+      channelId: assistantRef.channelId,
+      threadTs: assistantRef.threadTs,
+      text: asImprovementRoadmapText()
+    });
+    return;
+  }
+
+  if (inferredTopic === "access") {
+    await input.slackApi.postThreadReply({
+      channelId: assistantRef.channelId,
+      threadTs: assistantRef.threadTs,
+      text: asAccessPlanText(context)
+    });
+    return;
+  }
+
+  if (inferredTopic) {
+    await input.slackApi.postThreadReply({
+      channelId: assistantRef.channelId,
+      threadTs: assistantRef.threadTs,
+      text: asTopicPlanText(inferredTopic)
+    });
+    return;
+  }
+
   await input.slackApi.postThreadReply({
     channelId: assistantRef.channelId,
     threadTs: assistantRef.threadTs,
-    text: [asImprovementRoadmapText(), "", asAccessPlanText(context)].join("\n")
+    text: [
+      "LLM chat is currently disabled. Set `AI_GATEWAY_API_KEY` in the API/workflow runtime environment.",
+      "",
+      "You can still use deterministic commands: `roadmap`, `memory`, `integrations`, `workflows`, `quality`, `access`."
+    ].join("\n")
   });
 }
 

@@ -10,6 +10,7 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
+    "@types/node": "^22.15.24",
     "@kwielford/core": "workspace:*"
   }
 }

@@ -24,6 +24,7 @@
     "workflow": "4.1.0-beta.57"
   },
   "devDependencies": {
+    "@types/node": "^22.15.24",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3"
   }

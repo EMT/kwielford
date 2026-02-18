@@ -522,14 +522,27 @@ async function handleAssistantMessageEvent(input: {
   }
 
   if (input.replyGenerator) {
-    let phase: "fetch_thread" | "generate_reply" | "post_reply" = "fetch_thread";
+    let threadMessages: AssistantReplyInput["threadMessages"] = [];
+
     try {
-      const threadMessages = await input.slackApi.fetchThreadMessages({
+      threadMessages = await input.slackApi.fetchThreadMessages({
         channelId: assistantRef.channelId,
         threadTs: assistantRef.threadTs
       });
+    } catch (error) {
+      console.error("[assistant-events] Failed to fetch thread context for LLM reply; continuing without history", {
+        phase: "fetch_thread",
+        channelId: assistantRef.channelId,
+        threadTs: assistantRef.threadTs,
+        sourceChannelId: context?.sourceChannelId,
+        teamId: context?.teamId,
+        inputTextLength: text.length,
+        error: describeError(error)
+      });
+    }
 
-      phase = "generate_reply";
+    let phase: "generate_reply" | "post_reply" = "generate_reply";
+    try {
       const llmReply = await input.replyGenerator.generateReply({
         text,
         sourceChannelId: context?.sourceChannelId,
@@ -552,6 +565,7 @@ async function handleAssistantMessageEvent(input: {
         sourceChannelId: context?.sourceChannelId,
         teamId: context?.teamId,
         inputTextLength: text.length,
+        threadMessagesLength: threadMessages.length,
         error: describeError(error)
       });
 

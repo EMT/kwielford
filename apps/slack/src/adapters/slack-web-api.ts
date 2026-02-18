@@ -1,6 +1,14 @@
 interface SlackApiResponseBase {
   ok: boolean;
   error?: string;
+  needed?: string;
+  provided?: string;
+  warning?: string;
+  response_metadata?: {
+    next_cursor?: string;
+    warnings?: string[];
+    messages?: string[];
+  };
 }
 
 interface SlackReplyMessage {
@@ -44,7 +52,28 @@ export interface SlackThreadMessage {
 }
 
 function asErrorMessage(response: SlackApiResponseBase, status: number): string {
-  return response.error ? `Slack API error (${status}): ${response.error}` : `Slack API error (${status})`;
+  const details: string[] = [];
+
+  if (response.needed) {
+    details.push(`needed=${response.needed}`);
+  }
+  if (response.provided) {
+    details.push(`provided=${response.provided}`);
+  }
+  if (response.warning) {
+    details.push(`warning=${response.warning}`);
+  }
+  if (response.response_metadata?.warnings?.length) {
+    details.push(`warnings=${response.response_metadata.warnings.join(",")}`);
+  }
+  if (response.response_metadata?.messages?.length) {
+    details.push(`messages=${response.response_metadata.messages.join(" | ")}`);
+  }
+
+  const detailsSuffix = details.length > 0 ? ` (${details.join("; ")})` : "";
+  return response.error
+    ? `Slack API error (${status}): ${response.error}${detailsSuffix}`
+    : `Slack API error (${status})${detailsSuffix}`;
 }
 
 export class SlackWebApiAdapter {
@@ -87,8 +116,7 @@ export class SlackWebApiAdapter {
       const response = await this.callSlackApi<ConversationsRepliesResponse>("conversations.replies", {
         channel: input.channelId,
         ts: input.threadTs,
-        limit: 200,
-        cursor
+        ...(cursor ? { cursor } : {})
       });
 
       const pageMessages = (response.messages ?? [])

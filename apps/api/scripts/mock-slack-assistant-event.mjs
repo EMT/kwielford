@@ -29,7 +29,7 @@ const payload = {
     user: process.env.TEST_USER_ID ?? "U123456",
     text:
       process.env.TEST_TEXT ??
-      "https://fieldwork.slack.com/archives/C123456/p1739999999000100?thread_ts=1739999999.000100&cid=C123456",
+      "Help us make you better. Give me a phased access rollout across Slack channels and tools.",
     ts: process.env.TEST_EVENT_TS ?? "1739999999.000200",
     thread_ts: process.env.TEST_ASSISTANT_THREAD_TS ?? "1739999999.000200"
   }

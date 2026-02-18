@@ -3,21 +3,21 @@ _metadata:
   minor_version: 1
 display_information:
   name: Kwielford
-  description: Suggest improvements to your team workflows and summarize Slack threads.
+  description: Chat about improving Kwielford and plan phased access across channels and tools.
   background_color: "#1f2937"
 features:
   bot_user:
     display_name: Kwielford
     always_online: false
   assistant_view:
-    assistant_description: Suggest what to build next so Kwielford can help more, then summarize Slack threads with structured output.
+    assistant_description: Suggest what to build next so Kwielford can help more, and propose safe, incremental access expansion across channels and systems.
     suggested_prompts:
       - title: Improve Kwielford
         message: Help us make you a better assistant. What should we build first?
-      - title: Assistant roadmap
-        message: Suggest a 2-week roadmap to make you more useful for our team.
-      - title: Summarize a thread
-        message: Summarize this thread https://fieldwork.slack.com/archives/C123456/p1739999999000100?thread_ts=1739999999.000100&cid=C123456
+      - title: Access rollout
+        message: How should we incrementally give you more channel and tool access?
+      - title: Cross-channel plan
+        message: Propose a phased plan for expanding your access across Slack channels and systems.
       - title: How to use this
         message: How do I use this assistant?
 oauth_config:

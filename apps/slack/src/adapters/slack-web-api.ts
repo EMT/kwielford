@@ -1,6 +1,3 @@
-import type { ThreadSummaryMessageFetcher, ThreadSummaryResponder } from "@kwielford/app";
-import type { ThreadMessage } from "@kwielford/core";
-
 interface SlackApiResponseBase {
   ok: boolean;
   error?: string;
@@ -40,11 +37,17 @@ export interface SlackAssistantThreadSuggestedPrompt {
   message: string;
 }
 
+export interface SlackThreadMessage {
+  ts: string;
+  userId?: string;
+  text: string;
+}
+
 function asErrorMessage(response: SlackApiResponseBase, status: number): string {
   return response.error ? `Slack API error (${status}): ${response.error}` : `Slack API error (${status})`;
 }
 
-export class SlackWebApiAdapter implements ThreadSummaryMessageFetcher, ThreadSummaryResponder {
+export class SlackWebApiAdapter {
   private readonly botToken: string;
 
   public constructor(options: SlackWebApiAdapterOptions) {
@@ -74,11 +77,10 @@ export class SlackWebApiAdapter implements ThreadSummaryMessageFetcher, ThreadSu
   }
 
   public async fetchThreadMessages(input: {
-    workspaceId: string;
     channelId: string;
     threadTs: string;
-  }): Promise<ThreadMessage[]> {
-    const out: ThreadMessage[] = [];
+  }): Promise<SlackThreadMessage[]> {
+    const out: SlackThreadMessage[] = [];
     let cursor: string | undefined;
 
     do {

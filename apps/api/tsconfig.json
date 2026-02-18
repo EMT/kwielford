@@ -8,9 +8,7 @@
   },
   "include": ["src/**/*.ts"],
   "references": [
-    { "path": "../../packages/app" },
     { "path": "../../packages/config" },
-    { "path": "../../packages/db" },
     { "path": "../../packages/core" },
     { "path": "../../apps/slack" }
   ]

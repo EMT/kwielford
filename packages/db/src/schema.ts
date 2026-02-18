@@ -14,7 +14,6 @@ import {
 const createdAt = () => timestamp("created_at", { withTimezone: true, mode: "date" }).notNull().defaultNow();
 
 export const agentTaskKindEnum = pgEnum("agent_task_kind", [
-  "thread_summary",
   "draft_client_reply",
   "follow_up_extraction",
   "follow_up_item"

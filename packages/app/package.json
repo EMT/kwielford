@@ -8,9 +8,5 @@
   "scripts": {
     "build": "tsc -b",
     "typecheck": "tsc -b"
-  },
-  "dependencies": {
-    "@kwielford/core": "workspace:*",
-    "@kwielford/db": "workspace:*"
   }
 }

@@ -9,20 +9,16 @@
     "build": "tsc -b && next build --webpack",
     "dev": "next dev",
     "start": "next start",
-    "test:slash-command": "node scripts/mock-slack-command.mjs",
     "test:assistant-event": "node scripts/mock-slack-assistant-event.mjs",
     "typecheck": "tsc -b"
   },
   "dependencies": {
-    "@kwielford/app": "workspace:*",
     "@kwielford/config": "workspace:*",
     "@kwielford/core": "workspace:*",
-    "@kwielford/db": "workspace:*",
     "@kwielford/slack": "workspace:*",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest",
-    "workflow": "4.1.0-beta.57"
+    "react-dom": "latest"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",

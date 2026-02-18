@@ -945,7 +945,6 @@
       "name": "agent_task_kind",
       "schema": "public",
       "values": [
-        "thread_summary",
         "draft_client_reply",
         "follow_up_extraction",
         "follow_up_item"

@@ -1,1 +1,6 @@
-export * from "./thread-summary-flow.js";
+export function getAppHealth() {
+  return {
+    service: "app",
+    status: "ok"
+  };
+}

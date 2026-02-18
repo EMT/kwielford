@@ -1,5 +1,5 @@
 CREATE TYPE "public"."agent_run_status" AS ENUM('queued', 'running', 'succeeded', 'failed', 'cancelled');--> statement-breakpoint
-CREATE TYPE "public"."agent_task_kind" AS ENUM('thread_summary', 'draft_client_reply', 'follow_up_extraction', 'follow_up_item');--> statement-breakpoint
+CREATE TYPE "public"."agent_task_kind" AS ENUM('draft_client_reply', 'follow_up_extraction', 'follow_up_item');--> statement-breakpoint
 CREATE TYPE "public"."agent_task_status" AS ENUM('open', 'in_progress', 'completed', 'failed', 'cancelled');--> statement-breakpoint
 CREATE TYPE "public"."audit_actor_type" AS ENUM('system', 'user', 'slack', 'cli', 'api');--> statement-breakpoint
 CREATE TYPE "public"."message_role" AS ENUM('user', 'assistant', 'system', 'tool');--> statement-breakpoint

@@ -10,8 +10,6 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
-    "@kwielford/app": "workspace:*",
-    "@kwielford/core": "workspace:*",
-    "@kwielford/db": "workspace:*"
+    "@kwielford/core": "workspace:*"
   }
 }
